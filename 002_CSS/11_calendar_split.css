@@ -1,0 +1,30 @@
+th,
+td {
+  width: 14%;
+}
+
+tr:first-child {
+  background-color: #eee;
+}
+
+th:last-child,
+td:last-child {
+  color: blue;
+}
+
+th:first-child,
+td:first-child {
+  color: red;
+}
+
+th,
+td,
+tr {
+  border: solid 1px black;
+}
+
+table,
+img {
+  width: 50%;
+  text-align: center;
+}
