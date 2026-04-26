@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <title>AOS(Animate On Scrol)</title>
+    <!-- 스크롤 동작 자바스크립트 애니메이션 라이브러리 -->
+    <style>
+      /* body {
+        height: 2000px;
+        padding: 50px;
+      } */
+      .box {
+        margin: 100px 0;
+        padding: 40px;
+        background-color: #ffc7c7;
+        border: 2px solid #ff7373;
+        text-align: center;
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>스크롤하면서 등장하는 요소들</h1>
+    <div style="height: 95svh"></div>
+    <div class="box" data-aos="fade-up">첫 번째 박스</div>
+    <div class="box" data-aos="fade-right">두 번째 박스</div>
+    <div class="box" data-aos="fade-in">세 번째 박스</div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
+  </body>
+</html>
