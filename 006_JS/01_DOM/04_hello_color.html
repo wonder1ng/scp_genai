@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1 id="myHeading">마이 헤딩</h1>
+    <p>조금 더 긴 문장</p>
+    <button onclick="changeHeaderColor()">액션 버튼 1</button>
+    <script>
+      function changeHeaderColor() {
+        const myHeading = document.getElementById("myHeading");
+        console.log(myHeading);
+        // myHeading.textContent = "변경된 헤딩"
+        myHeading.style.color = "red";
+        myHeading.style.backgroundColor = "yellow";
+        myHeading.style.width = "200px";
+      }
+    </script>
+  </body>
+</html>

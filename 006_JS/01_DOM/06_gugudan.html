@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>구구단</title>
+  </head>
+  <body>
+    <h1>구구단 출력기</h1>
+    <input type="text" placeholder="단 입력 (예: 2)" id="input" />
+    <button onclick="printGugudan()">출력하기</button>
+    <div id="result">
+      <!-- 결과 출력 -->
+    </div>
+    <script>
+      function printGugudan() {
+        const userInput = document.getElementById("input");
+        const userInputValue = userInput.value;
+
+        console.log(userInputValue);
+
+        const userInputValueNumber = parseInt(userInputValue);
+
+        if (isNaN(userInputValue)) {
+          const result = document.getElementById("result");
+          result.unnerHTML = "<h3>입력은 숫자만 허용합니다.</h3>";
+          return;
+        }
+
+        if (userInputValueNumber < 1 || userInputValueNumber > 9) {
+          const result = document.getElementById("result");
+          result.innerHTML = "<h3>입력은 1~9까지만 허용됩니다.</h3>";
+          return;
+        }
+
+        const result = document.getElementById("result");
+        console.log(result);
+        result.innerHTML = `<h3>${userInputValue} 단</h3>`;
+
+        for (let i = 1; i <= 9; i++) {
+          result.innerHTML += `${userInputValue} x ${i} = ${userInputValue * i} </br>`;
+        }
+      }
+    </script>
+  </body>
+</html>
