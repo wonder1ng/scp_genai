@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>이미지 갤러리</h1>
+    <div class="gallery">
+      <img src="images/01.jpg" id="img1" width="100" />
+      <img src="images/02.jpg" id="img2" width="100" />
+      <img src="images/03.jpg" id="img3" width="100" />
+    </div>
+    <!-- 방법 1 -->
+    <img id="large-image" src="" />
+
+    <script>
+      const large = document.getElementById("large-image");
+      Array.from(document.getElementsByTagName("img"))
+        .slice(0, -1)
+        .forEach((v) => {
+          v.addEventListener("click", () => {
+            large.src = v.src;
+            large.width = "400";
+            large.style.display = "block";
+          });
+        });
+    </script>
+  </body>
+</html>

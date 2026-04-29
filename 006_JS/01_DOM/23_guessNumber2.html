@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>숫자 맞추기 게임</h1>
+    <input type="number" id="guessNumber" placeholder="숫자를 입력하시오" />
+    <button id="guessButton" onclick="guessNumber()">Guess</button>
+    <div id="result">
+      <!-- 결과가 출력될 곳 -->
+    </div>
+
+    <script>
+      const randomNumber = Math.floor(Math.random() * 100) + 1;
+      let result = document.getElementById("result");
+      console.log("생성한 숫자: ", randomNumber);
+
+      function guessNumber() {
+        // 로직 구현
+        const inputNumber = parseInt(
+          document.getElementById("guessNumber").value,
+        );
+        console.log(inputNumber);
+        const newResult = document.createElement("div");
+        if (inputNumber > randomNumber) {
+          newResult.textContent = `${inputNumber}보다 작습니다. 더 작은 숫자를 입력해주세요.`;
+        } else if (inputNumber < randomNumber) {
+          newResult.textContent = `${inputNumber}보다 큽니다. 더 큰 숫자를 입력해주세요.`;
+        } else
+          newResult.textContent = `축하합니다. ${document.getElementsByTagName("div").length}번만에 정답을 맞췄습니다.`;
+
+        result.appendChild(newResult);
+      }
+    </script>
+  </body>
+</html>
