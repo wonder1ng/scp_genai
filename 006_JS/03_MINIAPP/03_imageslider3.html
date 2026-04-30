@@ -39,30 +39,26 @@
       <img src="images/01.jpg" id="img1" class="active" />
       <img src="images/02.jpg" id="img2" />
       <img src="images/03.jpg" id="img3" />
-      <div class="filename" id="filename">images/01.jpg</div>
+      <div class="filename" id="fineName">images/01.jpg</div>
       <div class="buttons">
         <button id="prevBtn">이전</button>
         <button id="nextBtn">다음</button>
       </div>
     </div>
     <script>
-      const imgs = Array.from(document.getElementsByTagName("img"));
-      const prevBtn = document.getElementById("prevBtn");
-      const nextBtn = document.getElementById("nextBtn");
+      const imgs = document.getElementsByTagName("img");
+      const [prev, next] = document.getElementsByTagName("button");
+      const fineName = document.getElementById("fineName");
       let active = 0;
-      console.log(imgs[0].className);
-      prevBtn.addEventListener("click", () => {});
 
-      const large = document.getElementById("large-image");
-      Array.from(document.getElementsByTagName("img"))
-        .slice(0, -1)
-        .forEach((v) => {
-          v.addEventListener("click", () => {
-            large.src = v.src;
-            large.width = "400";
-            large.style.display = "block";
-          });
-        });
+      const show = (n) => {
+        imgs[active].classList.remove("active");
+        active = (active + n + imgs.length) % imgs.length;
+        imgs[active].classList.add("active");
+        fineName.textContent = imgs[active].getAttribute("src");
+      };
+      prev.onclick = () => show(-1);
+      next.onclick = () => show(1);
     </script>
   </body>
 </html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>TTS 예제</h1>
+    <textarea id="text" rows="4" cols="50">
+Hello, this is a text-to-speech example.</textarea
+    ><br />
+    <div class="controls">
+      <select id="voiceSelect">
+        <!-- 브라우저의 음석 목록 출력 -->
+      </select>
+      <button id="speakText" onclick="speak()">읽어주기</button>
+    </div>
+    <script>
+      const voiceSelect = document.getElementById("voiceSelect");
+
+      if ("speechSynthesis" in window) {
+        const updateVoice = () => {
+          const voices = window.speechSynthesis.getVoices();
+          console.log(voices);
+
+          voiceSelect.innerHTML = "";
+
+          voices.forEach((voice, index) => {
+            const option = document.createElement("option");
+            option.value = "";
+            option;
+          });
+        };
+        window.spee;
+
+        updateVoice();
+      } else {
+        alert("이 부라우저는 음성 기능을 지원하지 않습니다.");
+      }
+      const speakText = () => {
+        const selectedVoiceIndex = voiceSelect.value;
+        const selectedVoice =
+          window.speechSynthesis.getVoices()[selectedVoiceIndex];
+        const text = doc.getElementById("text").value;
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.voice = selectedVoice;
+        window.speechSynthesis.speak(speech);
+      };
+
+      const speakButton = doc.getElementById("");
+      function speak() {
+        const text = document.getElementById("text").value;
+        const speech = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(speech);
+        console.log(text);
+      }
+    </script>
+  </body>
+</html>

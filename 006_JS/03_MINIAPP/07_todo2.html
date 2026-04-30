@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* css만 gpt 작성 */
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR",
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: white;
+        margin-top: 60px;
+        margin-bottom: 20px;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      input#new-todo {
+        width: 300px;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        font-size: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      button#add-todo {
+        margin-left: 10px;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 10px;
+        background: #00c9ff;
+        background: linear-gradient(to right, #00c9ff, #92fe9d);
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      button#add-todo:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      ul#todo-list {
+        margin-top: 30px;
+        padding: 0;
+        width: 360px;
+      }
+
+      li {
+        list-style: none;
+        background: rgba(255, 255, 255, 0.9);
+        margin-bottom: 12px;
+        padding: 12px 15px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease;
+      }
+
+      li:hover {
+        transform: scale(1.02);
+      }
+
+      li button {
+        border: none;
+        background: #ff4d4d;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      li button:hover {
+        background: #e60000;
+      }
+
+      .done {
+        text-decoration: line-through;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>오늘 할일 (Todo) 리스트</h1>
+    <input type="text" id="new-todo" placeholder="할 일 입력" />
+    <button id="add-todo">추가</button>
+    <ul id="todo-list">
+      <!-- 할 일 표시될 곳 -->
+    </ul>
+    <script>
+      const newTodo = document.getElementById("new-todo");
+      const addTodo = document.getElementById("add-todo");
+      const todoList = document.getElementById("todo-list");
+
+      addTodo.addEventListener("click", () => {
+        if (newTodo.value) {
+          let newList = document.createElement("li");
+          newList.textContent = newTodo.value;
+          newList.onclick = () => newList.classList.toggle("done");
+          newBtn = document.createElement("button");
+          newBtn.textContent = "삭제";
+          newBtn.onclick = () => newList.remove();
+          newList.appendChild(newBtn);
+          todoList.appendChild(newList);
+          newTodo.value = "";
+        }
+      });
+    </script>
+  </body>
+</html>

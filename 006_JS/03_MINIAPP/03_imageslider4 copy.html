@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stable Slider</title>
+
+    <style>
+      .slider {
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+      }
+
+      .box {
+        position: relative;
+        height: 300px;
+        overflow: hidden;
+      }
+
+      .box img {
+        position: absolute;
+        width: 100%;
+        height: 300px;
+        top: 0;
+        left: 0;
+        transition: transform 0.6s ease;
+      }
+
+      button {
+        margin: 10px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="slider">
+      <div class="box">
+        <img src="images/01.jpg" />
+        <img src="images/02.jpg" />
+        <img src="images/03.jpg" />
+      </div>
+
+      <div id="name">images/01.jpg</div>
+
+      <button id="prev">이전</button>
+      <button id="next">다음</button>
+    </div>
+
+    <script>
+      const imgs = document.querySelectorAll(".box img");
+      const name = document.getElementById("name");
+
+      let current = 0;
+      let lock = false;
+
+      // 초기 상태
+      imgs.forEach((img, i) => {
+        img.style.transform = i === 0 ? "translateX(0)" : "translateX(100%)";
+      });
+
+      function move(dir) {
+        if (lock) return;
+        lock = true;
+
+        const next = (current + dir + imgs.length) % imgs.length;
+
+        const curImg = imgs[current];
+        const nextImg = imgs[next];
+
+        // 🔁 방향 반대로 변경
+        nextImg.style.transition = "none";
+        nextImg.style.transform =
+          dir === 1 ? "translateX(-100%)" : "translateX(100%)";
+
+        void nextImg.offsetWidth; // reflow
+
+        // 현재 이미지도 반대로 이동
+        curImg.style.transform =
+          dir === 1 ? "translateX(100%)" : "translateX(-100%)";
+
+        nextImg.style.transition = "transform 0.6s ease";
+        nextImg.style.transform = "translateX(0)";
+
+        current = next;
+        name.textContent = nextImg.getAttribute("src");
+
+        const onEnd = (e) => {
+          if (e.propertyName !== "transform") return;
+          lock = false;
+          curImg.removeEventListener("transitionend", onEnd);
+        };
+
+        curImg.addEventListener("transitionend", onEnd);
+      }
+
+      document.getElementById("next").onclick = () => move(1);
+      document.getElementById("prev").onclick = () => move(-1);
+    </script>
+  </body>
+</html>

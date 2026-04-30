@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      input {
+        padding: 10px;
+        font-size: 16px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        padding: 5px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>실시간 검색 필터</h1>
+    <input type="text" id="searchInput" placeholder="검색어..." />
+    <ul id="itemsList">
+      <li>apple</li>
+      <li>banana</li>
+      <li>orange</li>
+      <li>grape</li>
+      <li>strawberry</li>
+      <li>blueberry</li>
+      <li>pineapple</li>
+      <li>mango</li>
+      <li>watermelon</li>
+      <li>melon</li>
+      <li>peach</li>
+      <li>pear</li>
+      <li>cherry</li>
+      <li>kiwi</li>
+      <li>lemon</li>
+      <li>lime</li>
+      <li>plum</li>
+      <li>apricot</li>
+      <li>fig</li>
+      <li>pomegranate</li>
+    </ul>
+    <script>
+      const search = document.getElementById("searchInput");
+      const itemsList = document.getElementById("itemsList");
+      const liList = document.getElementsByTagName("li");
+      let timer;
+      words = Array.from(liList).map((v) => v.textContent);
+      search.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          const res = words.filter((v) =>
+            v.includes(search.value.toLowerCase()),
+          );
+          itemsList.innerHTML =
+            `<ul id="itemsList">` +
+            res.map((v) => `<li>${v}</li>`).join("") +
+            "</ul>";
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

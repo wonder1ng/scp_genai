@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="aniCanvas" width="400" height="300"></canvas>
+    <script>
+      const canvas = document.getElementById("aniCanvas");
+      const context = canvas.getContext("2d");
+
+      let x = 50;
+      let y = 50;
+      let radius = 10;
+      let speedX = 1;
+      let speedY = 1;
+
+      function drawBall() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.fillStyle = "red";
+        context.fill();
+        context.closePath();
+
+        x += speedX;
+        y += speedY;
+
+        if (y > canvas.height - radius) speedY = -1;
+        else if (y < radius) speedY = 1;
+        if (x > canvas.width - radius) speedX = -1;
+        else if (x < radius) speedX = 1;
+
+        requestAnimationFrame(drawBall);
+      }
+      drawBall();
+    </script>
+  </body>
+</html>

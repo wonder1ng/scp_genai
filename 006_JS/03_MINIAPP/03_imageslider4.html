@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      h1 {
+        text-align: center;
+      }
+      .slider {
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        text-align: center;
+        max-width: 600px;
+        align-items: center;
+      }
+      .imgSlider {
+        position: relative;
+        width: 100%;
+        height: 300px;
+      }
+      .slider img {
+        position: absolute;
+        height: 0px;
+        transform: translateX(-50%);
+        top: 0;
+      }
+      .slider img.active {
+        height: 300px;
+        z-index: -1;
+      }
+      .buttons {
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px;
+        font-size: 16px;
+      }
+      .toRight {
+        height: 300px !important;
+        transition-property: transform, opacity;
+        transition-timing-function: ease;
+        transition-duration: 0.8s;
+        transform: translateX(50%) !important;
+        opacity: 0;
+      }
+      .toLeft {
+        height: 300px !important;
+        transition-property: transform, opacity;
+        transition-timing-function: ease;
+        transition-duration: 0.8s;
+        transform: translateX(-150%) !important;
+        opacity: 0;
+      }
+      .fromRight {
+        height: 300px !important;
+        transition-property: transform, opacity;
+        transition-timing-function: ease;
+        transition-duration: 0.8s;
+        /* transform: translateX(50%) !important; */
+        right: -100%;
+        opacity: 1;
+      }
+      .fromLeft {
+        height: 300px !important;
+        transition-property: transform, opacity;
+        transition-timing-function: ease;
+        transition-duration: 0.8s;
+        /* transform: translateX(-150%) !important; */
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>이미지 슬라이더</h1>
+    <div class="slider">
+      <div class="imgSlider">
+        <img src="images/01.jpg" id="img1" class="active" />
+        <img src="images/02.jpg" id="img2" />
+        <img src="images/03.jpg" id="img3" />
+      </div>
+      <div class="filename" id="fineName">images/01.jpg</div>
+      <div class="buttons">
+        <button id="prevBtn">이전</button>
+        <button id="nextBtn">다음</button>
+      </div>
+    </div>
+    <script>
+      const imgs = document.getElementsByTagName("img");
+      const [prev, next] = document.getElementsByTagName("button");
+      const fineName = document.getElementById("fineName");
+      let active = 0;
+
+      const show = (n) => {
+        Array.from(imgs).forEach((v) => {
+          v.classList.remove("toRight");
+          v.classList.remove("toLeft");
+        });
+        imgs[active].classList.remove("active");
+        imgs[active].classList.add(n == 1 ? "toRight" : "toLeft");
+        active = (active + n + imgs.length) % imgs.length;
+
+        // imgs[active].style.transition = "none";
+        imgs[active].classList.add(n == 1 ? "fromLeft" : "fromRight");
+        imgs[active].style.transform =
+          n === 1 ? "translateX(-150%)" : "translateX(50%)";
+        imgs[active].offsetHeight;
+        imgs[active].transition = "transform 0.8s ease";
+        // imgs[active].style.transform = "translateX(50%)";
+
+        // imgs[active].style.transform =
+        //   n === 1 ? "translateX(-150%)" : "translateX(50%)";
+
+        imgs[active].classList.add("active");
+        fineName.textContent = imgs[active].getAttribute("src");
+      };
+      prev.onclick = () => show(-1);
+      next.onclick = () => show(1);
+    </script>
+  </body>
+</html>
