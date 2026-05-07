@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pacman</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        height: 100vh;
+      }
+
+      canvas {
+        border: 2px solid #333;
+        background: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas" width="800" height="800"></canvas>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // =========================
+      // 팩맨 상태
+      // =========================
+
+      const pacman = {
+        x: 400,
+        y: 400,
+
+        radius: 30,
+
+        speed: 4,
+
+        direction: "right",
+
+        // 입 애니메이션
+        mouth: 0.2,
+        mouthSpeed: 0.03,
+        mouthOpening: true,
+      };
+
+      // =========================
+      // 방향 회전값
+      // =========================
+
+      const rotationMap = {
+        right: 0,
+        down: Math.PI / 2,
+        left: Math.PI,
+        up: -Math.PI / 2,
+      };
+
+      // =========================
+      // 입력 처리
+      // =========================
+
+      document.addEventListener("keydown", (e) => {
+        switch (e.key.toLowerCase()) {
+          case "arrowup":
+          case "w":
+            pacman.direction = "up";
+            break;
+
+          case "arrowdown":
+          case "s":
+            pacman.direction = "down";
+            break;
+
+          case "arrowleft":
+          case "a":
+            pacman.direction = "left";
+            break;
+
+          case "arrowright":
+          case "d":
+            pacman.direction = "right";
+            break;
+        }
+      });
+
+      // =========================
+      // 이동
+      // =========================
+
+      function movePacman() {
+        switch (pacman.direction) {
+          case "up":
+            pacman.y -= pacman.speed;
+            break;
+
+          case "down":
+            pacman.y += pacman.speed;
+            break;
+
+          case "left":
+            pacman.x -= pacman.speed;
+            break;
+
+          case "right":
+            pacman.x += pacman.speed;
+            break;
+        }
+
+        // 경계 제한
+        pacman.x = Math.max(
+          pacman.radius,
+          Math.min(canvas.width - pacman.radius, pacman.x),
+        );
+
+        pacman.y = Math.max(
+          pacman.radius,
+          Math.min(canvas.height - pacman.radius, pacman.y),
+        );
+      }
+
+      // =========================
+      // 입 애니메이션
+      // =========================
+
+      function animateMouth() {
+        if (pacman.mouthOpening) {
+          pacman.mouth += pacman.mouthSpeed;
+
+          if (pacman.mouth >= 0.7) {
+            pacman.mouthOpening = false;
+          }
+        } else {
+          pacman.mouth -= pacman.mouthSpeed;
+
+          if (pacman.mouth <= 0.05) {
+            pacman.mouthOpening = true;
+          }
+        }
+      }
+
+      // =========================
+      // 팩맨 그리기
+      // =========================
+
+      function drawPacman() {
+        ctx.save();
+
+        // 중심 이동
+        ctx.translate(pacman.x, pacman.y);
+
+        // 방향 회전
+        ctx.rotate(rotationMap[pacman.direction]);
+
+        // 팩맨
+        ctx.beginPath();
+
+        ctx.moveTo(0, 0);
+
+        ctx.arc(0, 0, pacman.radius, pacman.mouth, Math.PI * 2 - pacman.mouth);
+
+        ctx.fillStyle = "yellow";
+        ctx.fill();
+
+        ctx.closePath();
+
+        ctx.restore();
+      }
+
+      // =========================
+      // 게임 루프
+      // =========================
+
+      function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        movePacman();
+
+        animateMouth();
+
+        drawPacman();
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      gameLoop();
+    </script>
+  </body>
+</html>

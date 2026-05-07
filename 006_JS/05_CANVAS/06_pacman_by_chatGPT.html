@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas Pac-Man</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin-bottom: 12px;
+        color: #ffe600;
+        letter-spacing: 2px;
+      }
+
+      .info {
+        width: 560px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+
+      canvas {
+        background: #050520;
+        border: 4px solid #1e90ff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(30, 144, 255, 0.5);
+      }
+
+      .controls {
+        margin-top: 14px;
+        text-align: center;
+        color: #ccc;
+        line-height: 1.6;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.65);
+        flex-direction: column;
+        gap: 16px;
+        color: white;
+        font-size: 28px;
+        visibility: hidden;
+      }
+
+      .overlay button {
+        padding: 12px 24px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        background: #ffe600;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .game-wrapper {
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🟡 PAC-MAN</h1>
+
+    <div class="info">
+      <div>점수: <span id="score">0</span></div>
+      <div>목숨: <span id="lives">3</span></div>
+    </div>
+
+    <div class="game-wrapper">
+      <canvas id="gameCanvas" width="560" height="620"></canvas>
+
+      <div class="overlay" id="overlay">
+        <div id="overlayText">GAME OVER</div>
+        <button onclick="restartGame()">다시 시작</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      방향키 또는 WASD로 이동<br />
+      모든 점을 먹으면 승리!
+    </div>
+
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const tileSize = 28;
+
+      const originalMap = [
+        "####################",
+        "#........##........#",
+        "#.####.#.##.#.####.#",
+        "#o####.#.##.#.####o#",
+        "#..................#",
+        "#.####.######.####.#",
+        "#......######......#",
+        "######........######",
+        "#......######......#",
+        "#.####.     #.####.#",
+        "#.....   GG  ......#",
+        "#.####.# GG  .####.#",
+        "#......######......#",
+        "######.######.######",
+        "#........##........#",
+        "#.####.#.##.#.####.#",
+        "#o..##...........#o#",
+        "###.##.######.##.#.#",
+        "#......#....#......#",
+        "#.######.##.######.#",
+        "#..................#",
+        "####################",
+      ];
+
+      let map = [...originalMap];
+
+      const rows = map.length;
+      const cols = map[0].length;
+
+      canvas.width = cols * tileSize;
+      canvas.height = rows * tileSize;
+
+      const scoreEl = document.getElementById("score");
+      const livesEl = document.getElementById("lives");
+      const overlay = document.getElementById("overlay");
+      const overlayText = document.getElementById("overlayText");
+
+      let score = 0;
+      let lives = 3;
+      let pellets = countPellets();
+      let powerMode = false;
+      let powerTimer = 0;
+      let gameOver = false;
+
+      class Player {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.radius = tileSize / 2 - 2;
+          this.speed = 2.5;
+          this.dx = 0;
+          this.dy = 0;
+          this.nextDx = 0;
+          this.nextDy = 0;
+          this.mouth = 0.2;
+          this.mouthDir = 0.02;
+        }
+
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+
+          let angle = 0;
+          if (this.dx > 0) angle = 0;
+          else if (this.dx < 0) angle = Math.PI;
+          else if (this.dy > 0) angle = Math.PI / 2;
+          else if (this.dy < 0) angle = -Math.PI / 2;
+
+          ctx.rotate(angle);
+
+          ctx.fillStyle = "#ffe600";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, this.radius, this.mouth, Math.PI * 2 - this.mouth);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.restore();
+
+          this.mouth += this.mouthDir;
+          if (this.mouth > 0.35 || this.mouth < 0.05) {
+            this.mouthDir *= -1;
+          }
+        }
+
+        update() {
+          if (this.canMove(this.nextDx, this.nextDy)) {
+            this.dx = this.nextDx;
+            this.dy = this.nextDy;
+          }
+
+          if (this.canMove(this.dx, this.dy)) {
+            this.x += this.dx * this.speed;
+            this.y += this.dy * this.speed;
+          }
+
+          if (this.x < 0) this.x = canvas.width;
+          if (this.x > canvas.width) this.x = 0;
+
+          this.eatPellet();
+        }
+
+        canMove(dx, dy) {
+          const newX = this.x + dx * this.speed;
+          const newY = this.y + dy * this.speed;
+
+          const left = Math.floor((newX - this.radius) / tileSize);
+          const right = Math.floor((newX + this.radius) / tileSize);
+          const top = Math.floor((newY - this.radius) / tileSize);
+          const bottom = Math.floor((newY + this.radius) / tileSize);
+
+          const cells = [
+            map[top]?.[left],
+            map[top]?.[right],
+            map[bottom]?.[left],
+            map[bottom]?.[right],
+          ];
+
+          return !cells.includes("#");
+        }
+
+        eatPellet() {
+          const col = Math.floor(this.x / tileSize);
+          const row = Math.floor(this.y / tileSize);
+
+          const cell = map[row][col];
+
+          if (cell === "." || cell === "o") {
+            map[row] =
+              map[row].substring(0, col) + " " + map[row].substring(col + 1);
+
+            score += cell === "." ? 10 : 50;
+            pellets--;
+            scoreEl.textContent = score;
+
+            if (cell === "o") {
+              powerMode = true;
+              powerTimer = 600;
+            }
+
+            if (pellets <= 0) {
+              endGame(true);
+            }
+          }
+        }
+      }
+
+      class Ghost {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          this.radius = tileSize / 2 - 2;
+          this.speed = 1.8;
+          this.dx = 1;
+          this.dy = 0;
+        }
+
+        draw() {
+          ctx.fillStyle = powerMode ? "#2244ff" : this.color;
+
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, Math.PI, 0);
+          ctx.lineTo(this.x + this.radius, this.y + this.radius);
+
+          for (let i = 0; i < 4; i++) {
+            ctx.lineTo(
+              this.x + this.radius - i * (this.radius / 2),
+              this.y + this.radius - (i % 2 === 0 ? 0 : 8),
+            );
+          }
+
+          ctx.lineTo(this.x - this.radius, this.y + this.radius);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = "white";
+          ctx.beginPath();
+          ctx.arc(this.x - 6, this.y - 2, 4, 0, Math.PI * 2);
+          ctx.arc(this.x + 6, this.y - 2, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "black";
+          ctx.beginPath();
+          ctx.arc(this.x - 6, this.y - 2, 2, 0, Math.PI * 2);
+          ctx.arc(this.x + 6, this.y - 2, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        update() {
+          const directions = [
+            [1, 0],
+            [-1, 0],
+            [0, 1],
+            [0, -1],
+          ];
+
+          if (!this.canMove(this.dx, this.dy) || Math.random() < 0.02) {
+            const possible = directions.filter(([dx, dy]) =>
+              this.canMove(dx, dy),
+            );
+            const dir = possible[Math.floor(Math.random() * possible.length)];
+
+            if (dir) {
+              this.dx = dir[0];
+              this.dy = dir[1];
+            }
+          }
+
+          this.x += this.dx * this.speed;
+          this.y += this.dy * this.speed;
+
+          if (this.x < 0) this.x = canvas.width;
+          if (this.x > canvas.width) this.x = 0;
+
+          this.checkCollision();
+        }
+
+        canMove(dx, dy) {
+          const newX = this.x + dx * this.speed;
+          const newY = this.y + dy * this.speed;
+
+          const left = Math.floor((newX - this.radius) / tileSize);
+          const right = Math.floor((newX + this.radius) / tileSize);
+          const top = Math.floor((newY - this.radius) / tileSize);
+          const bottom = Math.floor((newY + this.radius) / tileSize);
+
+          const cells = [
+            map[top]?.[left],
+            map[top]?.[right],
+            map[bottom]?.[left],
+            map[bottom]?.[right],
+          ];
+
+          return !cells.includes("#");
+        }
+
+        checkCollision() {
+          const dist = Math.hypot(player.x - this.x, player.y - this.y);
+
+          if (dist < this.radius + player.radius - 4) {
+            if (powerMode) {
+              this.x = 10 * tileSize;
+              this.y = 10 * tileSize;
+              score += 200;
+              scoreEl.textContent = score;
+            } else {
+              loseLife();
+            }
+          }
+        }
+      }
+
+      function drawMap() {
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const cell = map[row][col];
+            const x = col * tileSize;
+            const y = row * tileSize;
+
+            if (cell === "#") {
+              ctx.fillStyle = "#1e90ff";
+              ctx.fillRect(x, y, tileSize, tileSize);
+
+              ctx.strokeStyle = "#63b3ff";
+              ctx.lineWidth = 2;
+              ctx.strokeRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
+            }
+
+            if (cell === ".") {
+              ctx.fillStyle = "white";
+              ctx.beginPath();
+              ctx.arc(x + tileSize / 2, y + tileSize / 2, 3, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            if (cell === "o") {
+              ctx.fillStyle = "#ff66ff";
+              ctx.beginPath();
+              ctx.arc(x + tileSize / 2, y + tileSize / 2, 7, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+      }
+
+      const player = new Player(tileSize * 1.5, tileSize * 1.5);
+
+      const ghosts = [
+        new Ghost(tileSize * 10.5, tileSize * 9.5, "#ff3b3b"),
+        new Ghost(tileSize * 9.5, tileSize * 10.5, "#ff99ff"),
+        new Ghost(tileSize * 10.5, tileSize * 10.5, "#00ffff"),
+        new Ghost(tileSize * 11.5, tileSize * 10.5, "#ff9900"),
+      ];
+
+      function loseLife() {
+        lives--;
+        livesEl.textContent = lives;
+
+        if (lives <= 0) {
+          endGame(false);
+          return;
+        }
+
+        player.x = tileSize * 1.5;
+        player.y = tileSize * 1.5;
+        player.dx = 0;
+        player.dy = 0;
+      }
+
+      function endGame(win) {
+        gameOver = true;
+        overlay.style.visibility = "visible";
+        overlayText.textContent = win ? "🎉 YOU WIN!" : "💀 GAME OVER";
+      }
+
+      function restartGame() {
+        map = [...originalMap];
+        score = 0;
+        lives = 3;
+        pellets = countPellets();
+        powerMode = false;
+        powerTimer = 0;
+        gameOver = false;
+
+        scoreEl.textContent = score;
+        livesEl.textContent = lives;
+
+        overlay.style.visibility = "hidden";
+
+        player.x = tileSize * 1.5;
+        player.y = tileSize * 1.5;
+        player.dx = 0;
+        player.dy = 0;
+        player.nextDx = 0;
+        player.nextDy = 0;
+
+        ghosts[0].x = tileSize * 10.5;
+        ghosts[0].y = tileSize * 9.5;
+
+        ghosts[1].x = tileSize * 9.5;
+        ghosts[1].y = tileSize * 10.5;
+
+        ghosts[2].x = tileSize * 10.5;
+        ghosts[2].y = tileSize * 10.5;
+
+        ghosts[3].x = tileSize * 11.5;
+        ghosts[3].y = tileSize * 10.5;
+
+        gameLoop();
+      }
+
+      function countPellets() {
+        let total = 0;
+
+        for (const row of map) {
+          for (const cell of row) {
+            if (cell === "." || cell === "o") {
+              total++;
+            }
+          }
+        }
+
+        return total;
+      }
+
+      function gameLoop() {
+        if (gameOver) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawMap();
+
+        player.update();
+        player.draw();
+
+        ghosts.forEach((ghost) => {
+          ghost.update();
+          ghost.draw();
+        });
+
+        if (powerMode) {
+          powerTimer--;
+          if (powerTimer <= 0) {
+            powerMode = false;
+          }
+        }
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      document.addEventListener("keydown", (e) => {
+        switch (e.key.toLowerCase()) {
+          case "arrowup":
+          case "w":
+            player.nextDx = 0;
+            player.nextDy = -1;
+            break;
+
+          case "arrowdown":
+          case "s":
+            player.nextDx = 0;
+            player.nextDy = 1;
+            break;
+
+          case "arrowleft":
+          case "a":
+            player.nextDx = -1;
+            player.nextDy = 0;
+            break;
+
+          case "arrowright":
+          case "d":
+            player.nextDx = 1;
+            player.nextDy = 0;
+            break;
+        }
+      });
+
+      gameLoop();
+    </script>
+  </body>
+</html>

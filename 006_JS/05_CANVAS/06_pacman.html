@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="aniCanvas" width="1000" height="1000"></canvas>
+    <script>
+      const canvas = document.getElementById("aniCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // // 팩맨
+      let x = 500;
+      let y = 500;
+      let radius = 30;
+      // 입 움직임
+      let mouthMotion = 1;
+      let mouthUp = Math.PI - mouthMotion;
+      let mouthDown = mouthMotion;
+      let mouthSpeed = 0.1;
+      let mouthMove = mouthSpeed;
+
+      // // 이동
+      // 방향: 0: 상, 1: 하, 2: 좌, 3: 우
+      let direction = 3;
+      let moveSpeed = radius / 5;
+
+      function pacman() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 이동에 따른 입 움직임
+        switch (direction) {
+          case 0:
+            if (mouthDown > mouthMotion + 1) mouthMove = -mouthSpeed;
+            else if (mouthDown < mouthMotion) mouthMove = mouthSpeed;
+            y -= y <= radius ? 0 : moveSpeed;
+            break;
+          case 1:
+            if (mouthDown > mouthMotion + 1) mouthMove = -mouthSpeed;
+            else if (mouthDown < mouthMotion) mouthMove = mouthSpeed;
+            y += y >= canvas.height - radius ? 0 : moveSpeed;
+            break;
+          case 2:
+            x -= x <= radius ? 0 : moveSpeed;
+            if (mouthDown > mouthMotion + 1) mouthMove = -mouthSpeed;
+            else if (mouthDown < mouthMotion) mouthMove = mouthSpeed;
+            break;
+          case 3:
+            x += x >= canvas.width - radius ? 0 : moveSpeed;
+            if (mouthDown > mouthMotion) mouthMove = -mouthSpeed;
+            else if (mouthDown < mouthMotion - 1) mouthMove = mouthSpeed;
+            break;
+        }
+        mouthUp -= mouthMove;
+        mouthDown += mouthMove;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 30, mouthUp, Math.PI + mouthUp);
+        ctx.fillStyle = "#f9f900";
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.arc(x, y, 30, mouthDown, Math.PI + mouthDown);
+        ctx.fillStyle = "#f9f900";
+        ctx.fill();
+        ctx.closePath();
+
+        requestAnimationFrame(pacman);
+      }
+
+      // 키 입력
+      function directionChange() {
+        document.addEventListener("keydown", (e) => {
+          switch (e.key) {
+            case "ArrowUp":
+            case "w":
+            case "W":
+              if (direction !== 0) {
+                mouthMotion = -Math.PI / 2;
+                mouthUp = mouthMotion * 3 - 1;
+                mouthDown = mouthMotion + 1;
+                direction = 0;
+              }
+              break;
+            case "ArrowDown":
+            case "s":
+            case "S":
+              if (direction !== 1) {
+                mouthMotion = Math.PI / 2;
+                mouthUp = mouthMotion * 3 - 1;
+                mouthDown = mouthMotion + 1;
+                direction = 1;
+              }
+              break;
+            case "ArrowLeft":
+            case "a":
+            case "A":
+              if (direction !== 2) {
+                mouthMotion = -1;
+                mouthUp = Math.PI - mouthMotion;
+                mouthDown = mouthMotion;
+                direction = 2;
+              }
+              break;
+            case "ArrowRight":
+            case "d":
+            case "D":
+              if (direction !== 3) {
+                mouthMotion = 1;
+                mouthUp = Math.PI - mouthMotion;
+                mouthDown = mouthMotion;
+                direction = 3;
+              }
+              break;
+          }
+        });
+      }
+      directionChange();
+      pacman();
+    </script>
+  </body>
+</html>
