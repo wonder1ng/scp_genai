@@ -18,8 +18,8 @@
       const snake = {
         x: [0],
         y: [0],
-        size: 20,
-        speed: 200,
+        size: 10,
+        speed: 100,
         // 0: 상, 1: 하, 2: 좌, 3: 우
         direction: 1,
       };
@@ -90,8 +90,6 @@
         }
 
         if (apple.x === snake.x[0] && apple.y === snake.y[0]) {
-          // snake.x.push(apple.x);
-          // snake.y.push(apple.y);
           apple.loc = false;
         } else {
           snake.x.pop();
@@ -153,7 +151,7 @@
         min = Math.floor(sec / 60);
         if (
           confirm(
-            `${min}분 ${sec % 60}초 동안 ${snake.x.length - 1}의 사과를 먹었습니다.\n다시 시작하시겠습니까?`,
+            `${min}분 ${sec % 60}초 동안 ${snake.x.length - 1}개의 사과를 먹었습니다.\n다시 시작하시겠습니까?`,
           )
         )
           location.reload(true);
