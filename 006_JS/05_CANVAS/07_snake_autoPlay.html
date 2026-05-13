@@ -1,0 +1,263 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      canvas {
+        border: 1px solid #000;
+      }
+    </style>
+    <title>Snake Game</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const snake = {
+        x: [0],
+        y: [0],
+        size: 10,
+        speed: 100,
+        direction: 1,
+      };
+
+      const apple = {
+        x:
+          Math.floor(Math.random() * (canvas.width / snake.size - 1) + 1) *
+          snake.size,
+        y:
+          Math.floor(Math.random() * (canvas.height / snake.size - 1) + 1) *
+          snake.size,
+        size: snake.size,
+        loc: false,
+      };
+
+      function drawSnake() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        snake.x.forEach((_, i) => {
+          ctx.fillStyle = "blue";
+          ctx.fillRect(snake.x[i], snake.y[i], snake.size, snake.size);
+        });
+      }
+
+      function drawApple() {
+        ctx.save();
+        while (!apple.loc) {
+          apple.loc = true;
+          for (let i = 0; i < snake.x.length; i++) {
+            if (snake.x[i] === apple.x && snake.y[i] === apple.y) {
+              apple.x =
+                Math.floor(Math.random() * (canvas.width / snake.size)) *
+                snake.size;
+              apple.y =
+                Math.floor(Math.random() * (canvas.height / snake.size)) *
+                snake.size;
+              apple.loc = false;
+            }
+          }
+        }
+        ctx.fillStyle = "red";
+        ctx.fillRect(apple.x, apple.y, apple.size, apple.size);
+        ctx.restore();
+      }
+
+      function moveSnake() {
+        switch (snake.direction) {
+          case 0:
+            snake.y.unshift(snake.y[0] - snake.size);
+            snake.x.unshift(snake.x[0]);
+            break;
+          case 1:
+            snake.y.unshift(snake.y[0] + snake.size);
+            snake.x.unshift(snake.x[0]);
+            break;
+          case 2:
+            snake.x.unshift(snake.x[0] - snake.size);
+            snake.y.unshift(snake.y[0]);
+            break;
+          case 3:
+            snake.x.unshift(snake.x[0] + snake.size);
+            snake.y.unshift(snake.y[0]);
+            break;
+        }
+
+        if (apple.x === snake.x[0] && apple.y === snake.y[0]) {
+          apple.loc = false;
+        } else {
+          snake.x.pop();
+          snake.y.pop();
+        }
+
+        for (let i = 1; i < snake.x.length; i++) {
+          if (snake.x[i] === snake.x[0] && snake.y[i] === snake.y[0]) {
+            gameOver();
+          }
+        }
+
+        if (
+          snake.x[0] >= canvas.width ||
+          snake.x[0] < 0 ||
+          snake.y[0] < 0 ||
+          snake.y[0] >= canvas.height
+        ) {
+          gameOver();
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        switch (e.key.toLowerCase()) {
+          case "arrowup":
+          case "w":
+            snake.direction = 0;
+            break;
+          case "arrowdown":
+          case "s":
+            snake.direction = 1;
+            break;
+          case "arrowleft":
+          case "a":
+            snake.direction = 2;
+            break;
+          case "arrowright":
+          case "d":
+            snake.direction = 3;
+            break;
+        }
+      });
+
+      /* =========================
+         🔥 GAME LOOP (안정화)
+         ========================= */
+
+      gameStart = setInterval(() => {
+        // 🔥 고립되면 즉시 게임 종료 (멈춤 방지 핵심)
+        if (!hasAnyMoveFutureSafe()) {
+          gameOver();
+          return;
+        }
+        autoPlay();
+
+        moveSnake();
+        drawSnake();
+        drawApple();
+      }, snake.speed);
+
+      function gameOver() {
+        clearInterval(gameStart);
+        sec = Math.floor(performance.now() / 1000);
+        min = Math.floor(sec / 60);
+        if (
+          confirm(
+            `${min}분 ${sec % 60}초 동안 ${snake.x.length - 1}개의 사과를 먹었습니다.\n다시 시작하시겠습니까?`,
+          )
+        )
+          location.reload();
+      }
+
+      /* =========================
+         🔥 방향 정의
+         ========================= */
+
+      const dirs = [
+        { dx: 0, dy: -snake.size, d: 0 },
+        { dx: 0, dy: snake.size, d: 1 },
+        { dx: -snake.size, dy: 0, d: 2 },
+        { dx: snake.size, dy: 0, d: 3 },
+      ];
+
+      function isSafe(x, y, body) {
+        return (
+          x >= 0 &&
+          y >= 0 &&
+          x < canvas.width &&
+          y < canvas.height &&
+          !body.some((b, i) => i !== 0 && b.x === x && b.y === y)
+        );
+      }
+
+      /* =========================
+         🔥 BFS (최단 경로 탐색)
+         ========================= */
+
+      function bfs(startX, startY) {
+        const queue = [{ x: startX, y: startY, path: [] }];
+        const visited = new Set();
+
+        const body = snake.x.map((x, i) => ({ x, y: snake.y[i] }));
+
+        while (queue.length) {
+          const cur = queue.shift();
+          const key = cur.x + "," + cur.y;
+
+          if (visited.has(key)) continue;
+          visited.add(key);
+
+          if (cur.x === apple.x && cur.y === apple.y) {
+            return cur.path;
+          }
+
+          for (const dir of dirs) {
+            const nx = cur.x + dir.dx;
+            const ny = cur.y + dir.dy;
+
+            if (isSafe(nx, ny, body)) {
+              queue.push({
+                x: nx,
+                y: ny,
+                path: [...cur.path, dir.d],
+              });
+            }
+          }
+        }
+        return null;
+      }
+
+      /* =========================
+         🔥 고립 감지 (미래 기준)
+         ========================= */
+
+      function hasAnyMoveFutureSafe() {
+        const body = snake.x.map((x, i) => ({ x, y: snake.y[i] }));
+
+        for (const dir of dirs) {
+          const nx = snake.x[0] + dir.dx;
+          const ny = snake.y[0] + dir.dy;
+
+          if (isSafe(nx, ny, body)) return true;
+        }
+        return false;
+      }
+
+      /* =========================
+         🔥 AI (안정화 버전)
+         ========================= */
+
+      function autoPlay() {
+        const path = bfs(snake.x[0], snake.y[0]);
+
+        if (path && path.length > 0) {
+          snake.direction = path[0];
+          return;
+        }
+
+        // 🔥 fallback (무조건 1개 선택)
+        const body = snake.x.map((x, i) => ({ x, y: snake.y[i] }));
+
+        for (const dir of dirs) {
+          const nx = snake.x[0] + dir.dx;
+          const ny = snake.y[0] + dir.dy;
+
+          if (isSafe(nx, ny, body)) {
+            snake.direction = dir.d;
+            return;
+          }
+        }
+
+        // 🔥 완전 고립이면 방향 유지 (game loop에서 종료됨)
+      }
+    </script>
+  </body>
+</html>
