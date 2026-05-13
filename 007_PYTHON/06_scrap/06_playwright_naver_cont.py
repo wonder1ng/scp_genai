@@ -22,6 +22,7 @@
 #     print(f.read())
 
 from playwright.sync_api import sync_playwright
+import csv
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=False)
     page = browser.new_page()
@@ -44,9 +45,13 @@ with sync_playwright() as p:
         page.go_back()
 
     basePath = "\\".join(__file__.split("\\")[:-1])
-    fileName = basePath + "\\naver_news_IT2.csv"
+    fileName = basePath + "\\naver_news_IT2.tsv"
 
     with open(fileName, "w", newline="", encoding="utf_8") as f:
-        [f.writelines("\t".join(one) + "\n") for one in data]
+        writer = csv.writer(f, delimiter="\t")
+        writer.writerows(data)
     with open(fileName, "r", encoding="utf_8") as f:
-        print(f.read())
+        csv_reader = csv.reader(f, delimiter="\t")
+        for row in csv_reader:
+            data.append(row)
+    print(data)
