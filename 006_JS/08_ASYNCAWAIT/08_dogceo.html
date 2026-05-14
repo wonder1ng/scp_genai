@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="result" style="display: flex; justify-content: space-between">
+      <div
+        id="breedsDiv"
+        style="width: 48vw; display: flex; flex-direction: column; gap: 2px"
+      >
+        <button type="submit" id="breed">new random breed image</button>
+        <div id="breedsDivList"></div>
+      </div>
+      <div
+        id="subBreedsDiv"
+        style="width: 48vw; display: flex; flex-direction: column; gap: 2px"
+      ></div>
+    </div>
+
+    <script>
+      const breedsDivList = document.getElementById("breedsDivList");
+      async function init() {
+        const res = await fetch("https://dog.ceo/api/breeds/list/all");
+        const data = await res.json();
+        const breedsList = Object.keys(data.message);
+        breedsDivList.innerHTML =
+          `<select id="breeds" onchange="breedOptionHandler()" style="width: 48vw;">` +
+          breedsList.map((v) => `<option value="${v}">${v}</option>`).join("") +
+          `</select><div><img id="breedImage" style="max-height: 80vh; max-width: 48vw;"></div>`;
+      }
+      init();
+
+      async function getBreedImage() {
+        const breeds = document.getElementById("breeds");
+        const breedImage = document.getElementById("breedImage");
+        const res = await fetch(
+          `https://dog.ceo/api/breed/${breeds.value}/images/random`,
+        );
+        const data = await res.json();
+        breedImage.src = data.message;
+      }
+      document.getElementById("breed").onclick = getBreedImage;
+      async function breedOptionHandler() {
+        await getBreedImage();
+        await getSubBreedsList();
+      }
+
+      async function getSubBreedsList() {
+        const breeds = document.getElementById("breeds");
+        const res = await fetch(
+          `https://dog.ceo/api/breed/${breeds.value}/list`,
+        );
+        const data = await res.json();
+        const subBreedsDiv = document.getElementById("subBreedsDiv");
+        if (data.message.length) {
+          subBreedsDiv.innerHTML =
+            `
+                      <button type="submit" onclick="getSubBreedImage()">new random sub breed image</button>
+                      <select id="subBreeds" onchange="getSubBreedImage()">
+                      <option value="All">All</option>` +
+            data.message
+              .map((v) => `<option value="${v}">${v}</option>`)
+              .join("") +
+            `</select><div><img id="subBreedImage" style="max-height: 80vh; max-width: 48vw;"></div>`;
+          const subBreeds = document.getElementById("subBreeds");
+          subBreeds.value = "All";
+          const subBreedImage = document.getElementById("subBreedImage");
+          const res2 = await fetch(
+            `https://dog.ceo/api/breed/${breeds.value}/images/random`,
+          );
+          const data2 = await res2.json();
+          subBreedImage.src = data2.message;
+        } else {
+          subBreedsDiv.innerHTML = "";
+        }
+      }
+
+      async function getSubBreedImage() {
+        const breeds = document.getElementById("breeds");
+        const subBreeds = document.getElementById("subBreeds");
+        if (subBreeds.value === "All") {
+          const subBreedImage = document.getElementById("subBreedImage");
+          const res = await fetch(
+            `https://dog.ceo/api/breed/${breeds.value}/images/random`,
+          );
+          const data = await res.json();
+          subBreedImage.src = data.message;
+        } else {
+          const subBreedImage = document.getElementById("subBreedImage");
+          const res = await fetch(
+            `https://dog.ceo/api/breed/${breeds.value}/${subBreeds.value}/images/random`,
+          );
+          const data = await res.json();
+          subBreedImage.src = data.message;
+        }
+      }
+    </script>
+  </body>
+</html>
