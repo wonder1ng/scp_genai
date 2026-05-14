@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>마이 타이틀</title>
+  </head>
+  <body>
+    <h1>사용자 정보</h1>
+    <!-- onsubmit: -->
+    <form
+      onsubmit="
+        event.preventDefault();
+        location.href = '/user/' + document.getElementById('id').value;
+      "
+    >
+      <label>사용자 ID: <input type="number" name="id" id="id" /></label>
+      <button type="submit">검색</button>
+    </form>
+
+    {% if user_id %}
+    <ul>
+      <!-- set: 변수 선언-->
+      <!-- prettier-ignore -->
+      {% set u = users.get(user_id) %}
+      {% if u %}
+      <li>ID: {{ u.id }}, 이름: {{ u.name }}, 이메일: {{ u.email }}</li>
+    </ul>
+    {% else %}
+    <ul>
+      <li>사용자를 찾을 수 없습니다.</li>
+    </ul>
+    <!-- prettier-ignore -->
+    {% endif %}
+    {% else %}
+    <ul>
+      {% for u in users.values() %}
+      <li>
+        <a href="/user/{{ u.id }}">ID: {{ u.id }}</a>, 이름: {{ u.name }},
+        이메일: {{ u.email }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </body>
+</html>

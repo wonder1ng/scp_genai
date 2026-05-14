@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>상품 조회</h1>
+    <form id="search">
+      <label>상품 ID: <input type="number" id="id" /></label>
+      <button type="submit">검색</button>
+      <ul id="productList"></ul>
+      <br />
+      <h2>새로운 상품 등록</h2>
+      <ul id="newUser">
+        <li>ID</li>
+        <input type="number" id="newId" placeholder="등록할 id를 입력하세요." />
+        <li>이름</li>
+        <input
+          type="text"
+          id="newName"
+          placeholder="등록할 상품명를 입력하세요."
+        />
+        <li>가격</li>
+        <input
+          type="text"
+          id="newPrice"
+          placeholder="등록할 가격을 입력하세요."
+        />
+      </ul>
+    </form>
+    <br />
+    <br />
+    <div id="crud">
+      <button id="post" type="button" onclick="register()">등록</button>
+    </div>
+
+    <script>
+      document.getElementById("search").addEventListener("submit", (ev) => {
+        ev.preventDefault();
+
+        const id = document.getElementById("id").value;
+        fetch(`/api/product/${id}`)
+          .then((resp) => resp.json())
+          .then((data) => {
+            console.log(data);
+            const product = document.getElementById("productList");
+
+            if (Array.isArray(data)) {
+              product.innerHTML =
+                "<h2>해당 ID는 존재하지 않습니다. 아래 목록을 참고해주세요.</h2><br />" +
+                data
+                  .map((e) => {
+                    return `<li>ID: ${e.id} 이름: ${e.name} 가격: ${e.price}</li>`;
+                  })
+                  .join("");
+            } else {
+              product.innerHTML = `
+              <li>ID: <span id="oldId">${data.id}</span></li>
+              <li>이름: ${data.name}</li>
+              <li>가격: ${data.price}</li>
+              `;
+              const crud = document.getElementById("crud");
+              crud.innerHTML = `
+              <button id="post" type="button" onclick="register()">등록</button>
+              <button id="patch" type="button" onclick="modify()">수정</button>
+              <button id="delete" type="button" onclick="erase()">삭제</button>
+              `;
+            }
+            document.getElementById("id").value = "";
+          });
+      });
+
+      function register() {
+        const id = Number(document.getElementById("newId").value);
+        const name = document.getElementById("newName").value;
+        const price = document.getElementById("newPrice").value;
+
+        if (id && name && price) {
+          fetch(`/api/product/${id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id,
+              name,
+              price,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              const product = document.getElementById("productList");
+              product.innerHTML = `
+                <li>ID: <span id="oldId">${data.id}</span></li>
+                <li>이름: ${data.name}</li>
+                <li>가격: ${data.price}</li>
+                `;
+              const crud = document.getElementById("crud");
+              crud.innerHTML = `
+                <button id="post" type="button" onclick="register()">등록</button>
+                <button id="patch" type="button" onclick="modify()">수정</button>
+                <button id="delete" type="button" onclick="erase()">삭제</button>
+                `;
+              document.getElementById("id").value = "";
+            })
+            .catch((e) => {
+              console.log("error", e);
+            });
+        }
+      }
+
+      function modify() {
+        const id = Number(document.getElementById("newId").value);
+        const name = document.getElementById("newName").value;
+        const price = document.getElementById("newPrice").value;
+        const oldId = Number(document.getElementById("oldId").innerText);
+
+        if (id && name && price) {
+          fetch(`/api/product/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id,
+              name,
+              price,
+              oldId,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              const product = document.getElementById("productList");
+              product.innerHTML = `
+                <li>ID: <span id="oldId">${data.id}</span></li>
+                <li>이름: ${data.name}</li>
+                <li>가격: ${data.price}</li>
+                `;
+              const crud = document.getElementById("crud");
+              crud.innerHTML = `
+                <button id="post" type="button" onclick="register()">등록</button>
+                <button id="patch" type="button" onclick="modify()">수정</button>
+                <button id="delete" type="button" onclick="erase()">삭제</button>
+                `;
+              document.getElementById("id").value = "";
+            })
+            .catch((e) => {
+              console.log("error", e);
+            });
+        }
+      }
+
+      function erase() {
+        const id = Number(document.getElementById("oldId").innerText);
+
+        fetch(`/api/product/${id}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const product = document.getElementById("productList");
+            product.innerHTML =
+              `<h3>ID ${id} 정보가 제거되었습니다.</h3>` +
+              data
+                .map((e) => {
+                  return `<li>ID: ${e.id} 이름: ${e.name} 가격: ${e.price}</li>`;
+                })
+                .join("");
+            const crud = document.getElementById("crud");
+            crud.innerHTML = `
+              <button id="post" type="button" onclick="register()">등록</button>
+              `;
+            document.getElementById("id").value = "";
+          })
+          .catch((e) => {
+            console.log("error", e);
+          });
+      }
+    </script>
+  </body>
+</html>

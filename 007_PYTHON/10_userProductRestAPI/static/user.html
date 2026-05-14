@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>User 검색</h1>
+    <form id="search">
+      <label>사용자ID: <input type="number" id="id" /></label>
+      <button type="submit">검색</button>
+      <ul id="userlist"></ul>
+      <br />
+      <h2>새로운 User 등록</h2>
+      <ul id="newUser">
+        <li id="newId">ID</li>
+        <input type="number" id="newId" placeholder="등록할 id를 입력하세요." />
+        <li id="newName">이름</li>
+        <input
+          type="text"
+          id="newName"
+          placeholder="등록할 이름를 입력하세요."
+        />
+        <li id="newEmail">Email</li>
+        <input
+          type="text"
+          id="newEmail"
+          placeholder="등록할 email를 입력하세요."
+        />
+      </ul>
+    </form>
+    <br />
+    <br />
+    <button id="post" type="button">등록</button>
+    <button id="patch" type="button">수정</button>
+    <button id="delete" type="button">삭제</button>
+
+    <script>
+      document.getElementById("search").addEventListener("submit", (ev) => {
+        ev.preventDefault();
+
+        const id = document.getElementById("id").value;
+        fetch(`/api/user/${id}`)
+          .then((resp) => resp.json())
+          .then((data) => {
+            console.log(data);
+            const user = document.getElementById("userlist");
+            user.innerHTML = `
+      <li id="oldId">ID: ${data.id}</li>
+      <li id="oldName">이름: ${data.name}</li>
+      <li id="oldEmail">Email: ${data.email}</li>
+      `;
+          });
+      });
+
+      document.getElementById("patch").addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log("worked");
+
+        const newId = document.getElementById("newId").value;
+        const newName = document.getElementById("newName").value;
+        const newEmail = document.getElementById("newEmail").value;
+        if (newId || newName || newEmail) {
+          fetch(`/api/user/${newId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: newId,
+              name: newName,
+              email: newEmail,
+            }),
+          })
+            .then((resp) => resp.json())
+            .then((data) => {
+              console.log(data);
+              const user = document.getElementById("userlist");
+              user.innerHTML = `
+      <li id="oldId">ID: ${data.id}</li>
+      <li id="oldName">이름: ${data.name}</li>
+      <li id="oldEmail">Email: ${data.email}</li>
+      `;
+            });
+        }
+      });
+      function patchHandler() {
+        e.preventDefault();
+        const newId = document.getElementById("newId").value;
+        const newName = document.getElementById("newName").value;
+        const newEmail = document.getElementById("newEmail").value;
+        const oldId = parseInt(
+          document.getElementById("oldId").innerText.substr(4),
+        );
+        if (newId || newName || newEmail) {
+          fetch(`/api/user/${oldId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: newId,
+              name: newName,
+              email: newEmail,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log(data);
+              const user = document.getElementById("userlist");
+              user.innerHTML = `
+<li id="oldId">ID: ${data.id}</li><input type="number" id="newId" placeholder="등록할 id를 입력하세요." />
+<li id="oldName">이름: ${data.name}</li><input type="text" id="newName" placeholder="등록할 이름를 입력하세요." />
+<li id="oldEmail">Email: ${data.email}</li><input type="text" id="newEmail" placeholder="등록할 email를 입력하세요." />
+<br />
+<button id="patch" type="button">수정</button>
+<button id="delete" type="button">삭제</button>
+`;
+            });
+        }
+      }
+    </script>
+  </body>
+</html>

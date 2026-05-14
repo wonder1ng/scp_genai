@@ -6,6 +6,7 @@ users = [
     {"name": "Alice", "age": 25, "phone": "123-456-7890"},
     {"name": "Bob", "age": 30, "phone": "123-555-7890"},
     {"name": "Charlie", "age": 27, "phone": "123-777-7890"},
+    {"name": "David", "age": 25, "phone": "123-888-7890"},
 ]
 
 @app.route("/")
@@ -22,7 +23,6 @@ def get_user_by_name(name):
             user = u
     if user: return jsonify(user)
     else: return jsonify({"message": "사용자를 찾지 못했습니다."})
-
+    
 if __name__ == "__main__":
-    # debug=True: 변경 사항이 실행 중에도 반영됨
     app.run(debug=True)
