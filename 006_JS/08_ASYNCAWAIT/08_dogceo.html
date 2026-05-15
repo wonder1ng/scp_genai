@@ -58,13 +58,14 @@
         if (data.message.length) {
           subBreedsDiv.innerHTML =
             `
-                      <button type="submit" onclick="getSubBreedImage()">new random sub breed image</button>
-                      <select id="subBreeds" onchange="getSubBreedImage()">
-                      <option value="All">All</option>` +
+            <button type="submit" onclick="getSubBreedImage()">new random sub breed image</button>
+            <div id="subBreedsDivList">
+            <select id="subBreeds" onchange="getSubBreedImage()" style="width: 48vw;">
+            <option value="All">All</option>` +
             data.message
               .map((v) => `<option value="${v}">${v}</option>`)
               .join("") +
-            `</select><div><img id="subBreedImage" style="max-height: 80vh; max-width: 48vw;"></div>`;
+            `</select><div><img id="subBreedImage" style="max-height: 80vh; max-width: 48vw;"></div></div>`;
           const subBreeds = document.getElementById("subBreeds");
           subBreeds.value = "All";
           const subBreedImage = document.getElementById("subBreedImage");
