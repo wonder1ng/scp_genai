@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% block title %}장바구니 페이지{% endblock %} {%
+block content %}
+<h1>장바구니</h1>
+<form method="POST">
+  {% if cart_items %}
+  <a
+    style="color: white; background-color: red"
+    href="{{ url_for('delete_from_cart', item_id=0) }}"
+  >
+    전체 비우기</a
+  >
+  <table border="1">
+    <tr>
+      <th>#</th>
+      <th>상품 이름</th>
+      <th>가격</th>
+      <th>수량</th>
+      <th>제거</th>
+    </tr>
+    {% for item_id, item in cart_items.items() %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ "{:,}".format(item.price) }}원</td>
+      <td>{{ item.quantity }}</td>
+      <td>
+        <a
+          style="color: white; background-color: red"
+          href="{{ url_for('delete_from_cart', item_id=item_id) }}"
+        >
+          제거
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <div>
+    <span style="font-weight: bold">총 합계: </span>
+    {{ "{:,}".format(total_price) }}원
+  </div>
+  {% else %}
+  <div style="background-color: lightyellow" width="100svw" height="2rem">
+    장바구니에 담긴 상품이 없습니다.
+  </div>
+  {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {%
+  for message in messages %}
+  <div>{{ message }}</div>
+  {% endfor %} {% endif %} {% endwith %}
+</form>
+{% endblock %}

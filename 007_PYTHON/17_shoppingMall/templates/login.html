@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block title %}홈페이지{% endblock %} {% block
+content %} {% if user %}
+<h1>사용자 정보 페이지</h1>
+<p>
+  이름: {{ user.name }} <br />
+  ID: {{ user.id }} <br />
+  PW: {{ user.pw }} <br />
+</p>
+<a href="logout">로그아웃</a>
+{% else %}
+<h1>로그인</h1>
+<form method="POST">
+  <label for="id">ID: </label>
+  <input type="text" name="id" />
+  <br />
+
+  <label for="pw">PW: </label>
+  <input type="password" name="pw" />
+  <br />
+  <input type="submit" value="로그인" />
+</form>
+{% endif %} {% if error %}
+<p style="color: red">{{error}}</p>
+{% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {%
+for message in messages %}
+<div>{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %} {% endblock %}
