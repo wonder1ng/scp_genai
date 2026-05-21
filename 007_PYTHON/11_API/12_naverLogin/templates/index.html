@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>네이버 로그인</title>
+  </head>
+  <body>
+    <h1>로그인</h1>
+    {% if user %}
+    <h2>안녕하세요, {{ user.nickname }} 님</h2>
+    {% if user.name %}
+    <div>당신의 이름은 {{ user.name }} 입니다.</div>
+    {% endif %} {% if user.email %}
+    <div>당신의 이메일은 {{ user.email }} 입니다.</div>
+    {% endif %} {% if user.profile_image %}
+    <img src="{{ user.profile_image }}" alt="" />
+    {% endif %} {% if user.birthday %}
+    <div>당신의 생일은{{ user.birthday }} 입니다.</div>
+    {% endif %}
+    <a href="{{ url_for('logout') }}">로그아웃</a>
+    {% endif %}
+
+    <a href="{{ url_for('naver_login') }}"
+      ><img src="https://static.nid.naver.com/oauth/small_g_in.PNG" />
+    </a>
+  </body>
+</html>
