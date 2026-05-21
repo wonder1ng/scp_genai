@@ -42,7 +42,7 @@ block content %}
   <div style="background-color: lightyellow" width="100svw" height="2rem">
     장바구니에 담긴 상품이 없습니다.
   </div>
-  {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {%
+  {% endif %} {% with messages = get_flashed_messagess() %} {% if messages %} {%
   for message in messages %}
   <div>{{ message }}</div>
   {% endfor %} {% endif %} {% endwith %}

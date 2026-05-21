@@ -1,7 +1,11 @@
+from datetime import timedelta
+
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 app = Flask(__name__)
 app.secret_key = "asdqwe"
+# session에 시간 줘서 자동 제거
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 
 items = [
     {"id": "item1", "name": "햄버거", "price": 3000},
@@ -50,7 +54,6 @@ def view_cart():
         total_price += item["price"] * quantity
 
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
-    
 
 if __name__ == "__main__":
     app.run(debug=True)

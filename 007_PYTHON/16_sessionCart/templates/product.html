@@ -14,7 +14,7 @@
         <a href="{{ url_for('add_to_cart', item_id=item.id) }}">카트에 추가</a>
         {% endfor %}
       </ul>
-      {% with messages = get_flashed_messages() %} {% if messages %} {% for
+      {% with messages = get_flashed_messagess() %} {% if messages %} {% for
       message in messages %}
       <div>{{ message }}</div>
       {% endfor %} {% endif %} {% endwith %}

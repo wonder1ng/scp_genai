@@ -21,7 +21,7 @@ content %} {% if user %}
 </form>
 {% endif %} {% if error %}
 <p style="color: red">{{error}}</p>
-{% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {%
+{% endif %} {% with messages = get_flashed_messagess() %} {% if messages %} {%
 for message in messages %}
 <div>{{ message }}</div>
 {% endfor %} {% endif %} {% endwith %} {% endblock %}

@@ -1,0 +1,32 @@
+<!-- prettier-ignore -->
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{% block content %} 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for msg in messages %}
+<p>{{ msg }}</p>
+<!-- prettier-ignore -->
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<h2>회원 정보 수정</h2>
+<form method="POST">
+  <label for="username">Username:</label>
+  <input
+    type="text"
+    id="username"
+    name="username"
+    value="{{ user.username }}"
+    readonly
+  /><br />
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" /><br />
+  <label for="username">Email:</label>
+  <input type="text" id="email" name="email" value="{{ user.email }}" /><br />
+  <button type="submit">정보수정</button>
+  <button type="submit"><a href="/profile/delete">회원탈퇴</a></button>
+</form>
+
+{% endblock %}
