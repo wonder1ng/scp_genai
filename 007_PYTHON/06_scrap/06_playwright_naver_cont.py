@@ -13,8 +13,8 @@
 #     content = BeautifulSoup(urlopen(article["href"]))
 #     data.append([article["href"], content.select_one("article").get_text().replace("\n", " ")])
 
-# basePath = "\\".join(__file__.split("\\")[:-1])
-# fileName = basePath + "\\naver_news_IT.csv"
+# base_path = "\\".join(__file__.split("\\")[:-1])
+# fileName = base_path + "\\naver_news_IT.csv"
 
 # with open(fileName, "w", newline="", encoding="utf_8") as f:
 #     [f.writelines("\t".join(one) + "\n") for one in data]
@@ -44,8 +44,8 @@ with sync_playwright() as p:
         data.append([url, page.locator("#newsct_article").inner_text().strip().replace("\n", " ")])
         page.go_back()
 
-    basePath = "\\".join(__file__.split("\\")[:-1])
-    fileName = basePath + "\\naver_news_IT2.tsv"
+    base_path = "\\".join(__file__.split("\\")[:-1])
+    fileName = base_path + "\\naver_news_IT2.tsv"
 
     with open(fileName, "w", newline="", encoding="utf_8") as f:
         writer = csv.writer(f, delimiter="\t")

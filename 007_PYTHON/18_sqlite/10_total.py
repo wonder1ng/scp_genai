@@ -1,8 +1,8 @@
 import sqlite3
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-# conn = sqlite3.connect(basePath + "\\example.db")
-with sqlite3.connect(basePath + "\\example.db") as conn:
+base_path = "\\".join(__file__.split("\\")[:-1])
+# conn = sqlite3.connect(base_path + "\\example.db")
+with sqlite3.connect(base_path + "\\example.db") as conn:
     cur = conn.cursor()
     cur.execute("select count(*) from users")
     rows = cur.fetchall()[0]    # [(2,)]

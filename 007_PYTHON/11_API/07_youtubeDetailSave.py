@@ -11,8 +11,8 @@ video_api_url = 'https://www.googleapis.com/youtube/v3/videos'
 
 video_ids = []
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\search_result.csv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\search_result.csv"
 with open(fileName, "r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     for row in reader:
@@ -31,7 +31,7 @@ table = []
 
 table_header = ["index", "title", "view_count", "like_count", "comment_count"]
 
-fileName = basePath + "\\video_stats.csv"
+fileName = base_path + "\\video_stats.csv"
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     writer = csv.writer(f)
     writer.writerow(table_header)

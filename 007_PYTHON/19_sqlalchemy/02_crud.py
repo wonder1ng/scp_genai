@@ -4,11 +4,11 @@ from sqlalchemy.orm.session import Session as TypeSession
 
 from sqlalchemy import Column, Integer, String
 
-basePath = "\\".join(__file__.split("\\")[:-1])
+base_path = "\\".join(__file__.split("\\")[:-1])
 # create_engine:
 # - SQLAlchemy의 "DB 연결 엔진" 생성 함수
 # - 실제로 DB와 통신하는 핵심 객체
-engine = create_engine(f"sqlite:///{basePath}\\example.db")
+engine = create_engine(f"sqlite:///{base_path}\\example.db")
 # declarative_base():
 # - ORM 모델(User 같은 클래스)들이 상속받는 기본 클래스 생성
 # - 이 Base를 통해 SQLAlchemy가 클래스들을 "테이블 정의"로 인식

@@ -56,8 +56,8 @@ with sync_playwright() as p:
     data.extend(list(zip(companies, titles, etc_infos, details, urls)))
 
 timeStr = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + f"\\wanted_post_{timeStr}.tsv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + f"\\wanted_post_{timeStr}.tsv"
 mode = "a+" if os.path.exists(fileName) else "w+"
 with open(fileName, mode, newline="", encoding="utf_8") as f:
     writer = csv.writer(f, delimiter="\t")
@@ -68,7 +68,7 @@ with open(fileName, "r", encoding="utf_8") as f:
         data.append(row)
 
 data = [data[0]] + [e for e in data if any(v in e[2] for v in ["신입", "인턴", "무관"])]
-fileName = basePath + f"\\wanted_post_junior_{timeStr}.tsv"
+fileName = base_path + f"\\wanted_post_junior_{timeStr}.tsv"
 mode = "a+" if os.path.exists(fileName) else "w+"
 with open(fileName, mode, newline="", encoding="utf_8") as f:
     writer = csv.writer(f, delimiter="\t")

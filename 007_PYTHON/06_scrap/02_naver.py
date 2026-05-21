@@ -21,8 +21,8 @@ articles.encoding = "utf_8"
 #         print(v.get("PC-NEWS-CHANNEL-BLOCK"))
 data= articles.json()["PC-MEDIA-WRAPPER"]["blocks"][0]["blocks"][0]["materials"]
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\naver_articles.csv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\naver_articles.csv"
 
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     csv_writer = csv.DictWriter(f, data[0].keys())
@@ -40,8 +40,8 @@ soup = BeautifulSoup(urlopen("https://www.naver.com/"), "html.parser")
 script = soup.find_all("script")[5]
 data = json.loads(script.text.split("\n")[5].split(" = ")[1])["materials"]
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\naver_articles2.csv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\naver_articles2.csv"
 
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     csv_writer = csv.DictWriter(f, data[0].keys())

@@ -1,10 +1,10 @@
 import sqlite3
 
-basePath = "\\".join(__file__.split("\\")[:-1])
+base_path = "\\".join(__file__.split("\\")[:-1])
 
 class MyDatabase():
     def __init__(self):
-        self.db = sqlite3.connect(basePath+"\\board.sqlite", check_same_thread=False)
+        self.db = sqlite3.connect(base_path+"\\board.sqlite", check_same_thread=False)
         self.cursor = self.db.cursor()
         self.cursor.execute("create table if not exists board (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, content TEXT NOT NULL)")
 

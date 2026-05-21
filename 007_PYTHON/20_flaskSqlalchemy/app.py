@@ -13,10 +13,10 @@ class User(db.Model):
         # print할 때 아래 형식으로 출력됨
         return f"<User {self.id}, {self.name}, {self.age}>"
     
-basePath = "\\".join(__file__.split("\\")[:-1])
+base_path = "\\".join(__file__.split("\\")[:-1])
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "my-secret"
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{basePath}\\example.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{base_path}\\example.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)

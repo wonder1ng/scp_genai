@@ -1,6 +1,6 @@
 import requests, csv, os
-basePath = "\\".join(__file__.split("\\")[:-1])
-with open(basePath + "\\env.txt", "r", encoding="utf_8") as f:
+base_path = "\\".join(__file__.split("\\")[:-1])
+with open(base_path + "\\env.txt", "r", encoding="utf_8") as f:
     res = [line.split("=")[1] for line in f.read().split("\n")]
     baseUrl = res[0]
     id = res[1]
@@ -16,8 +16,8 @@ for p in data:
     p["sales_count"] = detail.get("sales_count")
     p["reviews"] = detail.get("reviews")
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\logout.tsv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\logout.tsv"
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     csv_writer = csv.DictWriter(f, data[0].keys(), delimiter="\t")
     csv_writer.writeheader()
@@ -46,8 +46,8 @@ with sync_playwright() as p:
         p["sales_count"] = detail.get("sales_count")
         p["reviews"] = detail.get("reviews")
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\login.tsv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\login.tsv"
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     csv_writer = csv.DictWriter(f, data[0].keys(), delimiter="\t")
     csv_writer.writeheader()

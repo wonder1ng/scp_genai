@@ -12,8 +12,8 @@ for book in book_li:
     book.select_one("article > p")["class"][1],
     book.select_one("article > div.product_price > p.price_color").text])
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\books_toscrape.csv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\books_toscrape.csv"
 
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     csv_writer = csv.writer(f)

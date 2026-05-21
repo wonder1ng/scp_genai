@@ -1,7 +1,7 @@
 import sqlite3
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-conn = sqlite3.connect(basePath + "\\example.db")
+base_path = "\\".join(__file__.split("\\")[:-1])
+conn = sqlite3.connect(base_path + "\\example.db")
 
 cur = conn.cursor()
 cur.execute("select count(*) from users")

@@ -21,8 +21,8 @@ response = requests.get(url, params)
 data = response.json()
 print(data)
 
-basePath = "\\".join(__file__.split("\\")[:-1])
-fileName = basePath + "\\search_result.csv"
+base_path = "\\".join(__file__.split("\\")[:-1])
+fileName = base_path + "\\search_result.csv"
 with open(fileName, "w", newline="", encoding="utf_8") as f:
     writer = csv.writer(f)
     writer.writerow(["title", "video_id", "video_url", "description"])
