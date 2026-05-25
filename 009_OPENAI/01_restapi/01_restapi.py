@@ -16,7 +16,7 @@ response = requests.post(
             {"role": "user", "content": user_input}
         ],
         "temperature": 1.0,
-        "top_p": 0.5
+        "top_p": 0.5    # 생성할 단어 확률의 합이 x가 될때까지 후보군 지정
     },
     headers={
         "Content-Type": "application/json",

@@ -8,7 +8,6 @@ SYSTEM_PROMPT = "너는 나를 도와주는 20년 경력 작명가야"
 message = [{"role": "system", "content": SYSTEM_PROMPT}]
 MAX_RECENT_MESSAGES = 10
 
-message.append({"role": "user", "content": user_input})
 def call_chatgpt(messages, temperature=1.0):
     # 유저 발언 기억
     response = requests.post(
@@ -67,19 +66,19 @@ def manage_message_history():
     if has_summary:
         old_messages.insert(0, message[1])
     
-    summary_text = summarize_conversation(old_messages)
+        summary_text = summarize_conversation(old_messages)
 
-    summary_message = {
-        "role": "system",
-        "content": f"[대화 요약]\n{summary_text}"
-    }
+        summary_message = {
+            "role": "system",
+            "content": f"[대화 요약]\n{summary_text}"
+        }
 
-    recent_messages = message[-MAX_RECENT_MESSAGES:]
+        recent_messages = message[-MAX_RECENT_MESSAGES:]
 
-    message = [
-        message[0],
-        summary_message
-    ] + recent_messages
+        message = [
+            message[0],
+            summary_message
+        ] + recent_messages
 
 def ask_chatbot(user_input):
     message.append({"role": "user", "content": user_input})

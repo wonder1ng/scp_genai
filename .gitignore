@@ -8,6 +8,10 @@ tmp*.*
 *.db
 *.sqlite*
 *.zip
+*.json
+# vibe coding
+04_memo
+05_music_sns
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
