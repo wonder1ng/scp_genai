@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form>
+      <input id="text" name="text" type="text" placeholder="대화 입력" />
+      <button type="submit">보내기</button>
+    </form>
+    <div id="chat"></div>
+    <script>
+      document
+        .getElementsByTagName("form")[0]
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          const text = document.getElementById("text").value;
+          if (!text) return;
+          showChat(text);
+          fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.result === "fail") showChat(data.answer, "bot", true);
+              else showChat(data.answer, "bot");
+              return;
+            })
+            .catch((error) => {
+              console.log("create 처리 중 오류가 발생: ", error);
+            });
+        });
+
+      function showChat(data, role = "user", error = false) {
+        const chat = document.getElementById("chat");
+        chat.innerHTML +=
+          role === "user"
+            ? "<div style='color: darkgray;'>USER: " + data + "</div>"
+            : `<div ${error ? "style='color: red;'" : ""}>BOT: ${data} </div>`;
+      }
+    </script>
+  </body>
+</html>
