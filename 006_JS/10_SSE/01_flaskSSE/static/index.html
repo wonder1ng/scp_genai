@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>웹소켓 테스트</h1>
+    <input type="text" id="msg" placeholder="메시지 입력" />
+    <button id="send">전송</button>
+    <hr />
+    <div id="reply"></div>
+    <script>
+      const reply = document.getElementById("reply");
+
+      const source = new EventSource("/stream");
+      source.onopen = () => {
+        console.log("서버와 연결됨 = SSE 리슨 시작");
+      };
+      source.onmessage = (e) => {
+        console.log("서버 메시지:", event.data);
+        const newReply = document.createElement("div");
+        newReply.textContent = event.data;
+        reply.appendChild(newReply);
+      };
+
+      // 메시지 보내는 API
+      document.getElementById("send").addEventListener("click", () => {
+        const msg = document.getElementById("msg").value;
+        fetch("/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            // x-www-form-urlencoded의 기본 형태는 key=value
+          },
+          body: "msg=" + encodeURIComponent(msg),
+        });
+      });
+    </script>
+  </body>
+</html>
