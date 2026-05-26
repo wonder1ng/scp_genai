@@ -1,0 +1,19 @@
+{% extends "base.html" %} {% block content %}
+
+<section class="card">
+  <h2>{{ grade }}학년 커리큘럼</h2>
+
+  <div class="curriculum-grid">
+    {% for idx, curriculum in curriculums %}
+    <a
+      class="curriculum-card"
+      href="{{ url_for('curriculum', grade=grade, curriculum_id=idx)}}"
+    >
+      <h3>{{ curriculum }}</h3>
+      <p>영어 회화를 시작해보세요</p>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %} {% block content %}
+
+<section class="card">
+  <h2>{{ grade }}학년 - {{ curriculum_title }}</h2>
+
+  <div class="chat-container">
+    <ul id="chat" class="chat-box"></ul>
+
+    <form id="send" class="chat-form">
+      <input
+        type="text"
+        id="input"
+        placeholder="영어로 메시지를 입력하세요"
+        autocomplete="off"
+      />
+
+      <button type="submit">전송</button>
+    </form>
+  </div>
+</section>
+
+<script>
+  const input = document.getElementById("input");
+  const send = document.getElementById("send");
+  const chat = document.getElementById("chat");
+
+  send.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const message = input.value.trim();
+
+    if (!message) return;
+    input.value = "";
+
+    const params = document
+      .getElementsByTagName("h2")[0]
+      .innerText.split(" - ");
+
+    const response = await fetch("/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+
+      body: JSON.stringify({
+        message,
+        grade: params[0].slice(0, 1),
+        curriculum_title: params[1],
+      }),
+    });
+
+    chat.innerHTML += `
+      <li class="user-message">
+        <strong>Student</strong><br />
+        ${message}
+      </li>
+
+      <li class="bot-message"></li>
+    `;
+
+    const answer = chat.lastElementChild;
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    let fullText = "<strong>Teacher</strong><br />";
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split("\n");
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = line.slice(6);
+
+          if (data === "[DONE]") {
+            continue;
+          }
+
+          try {
+            const parsed = JSON.parse(data);
+
+            if (parsed.content) {
+              fullText += parsed.content;
+              answer.innerHTML = fullText;
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+  });
+</script>
+
+{% endblock %}

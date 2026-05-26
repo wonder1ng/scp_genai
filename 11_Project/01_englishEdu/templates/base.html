@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatGPT 영어 클래스</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header class="header">
+      <h1 class="logo">
+        <a href="/">📚 ChatGPT 영어 클래스</a>
+      </h1>
+
+      <nav>
+        <ul class="nav-menu">
+          {% for grade in grades %}
+          <li>
+            <a href="{{ url_for('grade', grade_value=grade) }}"
+              >{{ grade }}학년</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </header>
+
+    <main class="container">{% block content %} {% endblock %}</main>
+
+    <footer class="footer">
+      <p>&copy; 2026 SPC 생성형 AI 개발자 과정</p>
+    </footer>
+  </body>
+</html>

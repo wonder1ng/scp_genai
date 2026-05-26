@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>스트림 채팅</h1>
+    <input type="text" id="input" placeholder="메시지를 입력하시오" />
+    <button id="send">전송</button>
+    <div id="chat"></div>
+    <script>
+      const input = document.getElementById("input");
+      const send = document.getElementById("send");
+      const chat = document.getElementById("chat");
+
+      send.addEventListener("click", async () => {
+        const message = input.value.trim();
+
+        const response = await fetch("/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+
+        // const data = await response.json()
+        // 지금부터는 이게 아니고 event-stream으로 오는 걸 data: <content> \n\n
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          fullText += chunk.replace(/\n/g, "<br>");
+          chat.innerHTML = fullText;
+
+          chat.scrollTop = chat.scrollHeight;
+          document.scrollTop = document.scrollHeight;
+        }
+      });
+    </script>
+  </body>
+</html>

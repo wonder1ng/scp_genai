@@ -1,0 +1,64 @@
+{% extends "base.html" %} {% block content %}
+<h2>{{ grade }}학년 - {{ curriculum_title }}</h2>
+<h1>스트림 채팅</h1>
+<form id="send">
+  <input type="text" id="input" placeholder="메시지를 입력하시오" />
+  <button type="submit">전송</button>
+</form>
+<ul id="chat"></ul>
+<script>
+  const input = document.getElementById("input");
+  const send = document.getElementById("send");
+  const chat = document.getElementById("chat");
+
+  send.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    const params = document
+      .getElementsByTagName("h2")[0]
+      .innerText.split(" - ");
+    const response = await fetch("/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        grade: params[0].slice(0, 1),
+        curriculum_title: params[1],
+      }),
+    });
+    chat.innerHTML += `<li>student: ${message}</li><li></li>`;
+    const answer = chat.lastChild;
+    // const data = await response.json()
+    // 지금부터는 이게 아니고 event-stream으로 오는 걸 data: <content> \n\n
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = "teacher: ";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split("\n");
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = line.slice(6);
+          if (data === "[DONE]") {
+            chat.innerHTML + "<br /><br />";
+            continue;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.content) {
+              fullText += parsed.content;
+              answer.innerText = fullText;
+            }
+          } catch (e) {}
+        }
+      }
+      input.value = "";
+    }
+  });
+</script>
+{% endblock %}
