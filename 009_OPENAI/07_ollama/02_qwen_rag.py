@@ -34,6 +34,7 @@ def rag_query(user_query):
     print(f"사용자 질문: {user_query}")
     print(f"검색된 문서: {retrieved_doc}")
     print(f"유사도 점수: {similarity_score:.3f}")
+    print("="*30)
 
     # if similarity_score < 0.65:
     #     return "해당 내용은 적합한 답변을 찾을 수 없습니다."
@@ -74,6 +75,7 @@ def rag_wit_openai(user_query):
     print(f"사용자 질문: {user_query}")
     print(f"검색된 문서: {retrieved_doc}")
     print(f"유사도 점수: {similarity_score:.3f}")
+    print("="*30)
 
     # if similarity_score < 0.65:
     #     return "해당 내용은 적합한 답변을 찾을 수 없습니다."
@@ -105,4 +107,6 @@ def rag_wit_openai(user_query):
     return response.choices[0].message.content
 
 # print(rag_query("한국소프트웨어저작권협회은 뭔가요?"))
+# print(rag_wit_openai("한국소프트웨어저작권협회은 뭔가요?"))
 print(rag_query("홍길동은 누구인가요?"))
+print(rag_wit_openai("홍길동은 누구인가요?"))

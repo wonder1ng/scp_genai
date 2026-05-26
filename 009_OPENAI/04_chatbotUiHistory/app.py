@@ -33,7 +33,7 @@ def ask_chatgpt(chat_message):
     ]
 
     print("="*30)
-    print("우리가 물어볼 메세지:", gpt_ask_message)
+    print("우리가 물어볼 메시지:", gpt_ask_message)
     print("="*30)
 
     response = client.chat.completions.create(
