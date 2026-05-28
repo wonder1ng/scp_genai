@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>작명소</title>
+  </head>
+  <body>
+    <h1>회사 이름 생성기</h1>
+    <input type="text" id="userInput" placeholder="회사의 상품명 입력" />
+    <button id="send">이름 생성</button>
+    <h2>결과</h2>
+    <ul id="resultList"></ul>
+    <script>
+      document.getElementById("send").addEventListener("click", () => {
+        const userInput = document.getElementById("userInput");
+        data = fetch("api/name", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product: userInput.value,
+          }),
+        })
+          .then((resp) => resp.json())
+          .then((data) => {
+            console.log(data);
+            const resultList = document.getElementById("resultList");
+            resultList.innerHTML = data.chatbot
+              .map((v) => `<li>${v}</li>`)
+              .join("");
+          });
+      });
+    </script>
+  </body>
+</html>

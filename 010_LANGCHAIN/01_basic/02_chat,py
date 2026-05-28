@@ -1,0 +1,54 @@
+from dotenv import load_dotenv
+from langchain_openai import OpenAI     # 일반 LLM (구형)
+from langchain_openai import ChatOpenAI # 챗 LLM
+from langchain_core.messages import SystemMessage, HumanMessage
+
+load_dotenv()
+
+
+MODEL1 = "gpt-3.5-turbo-instruct"
+MODEL2 = "gpt-4o-mini"
+
+llm1 = OpenAI(model=MODEL1)
+prompt1 = "다음 문장을 한국어로 번역해: Good Morning"
+print(llm1.invoke(prompt1))
+print("=" * 30)
+
+llm2 = ChatOpenAI(model=MODEL2)
+prompt2 = "게임 회사를 창업하려는데 이름 후보 3개 작명"
+print(llm2.invoke(prompt2))
+print("=" * 30)
+
+prompt3 = [
+    SystemMessage(content="당신은 창의력 높은 작명가입니다."),
+    HumanMessage(content=prompt2),
+]
+
+print(llm2.invoke(prompt3))
+print("=" * 30)
+
+from langchain.chat_models import init_chat_model
+from langchain_core.messages import SystemMessage, HumanMessage
+
+# 1. 1회성 질문용 모델 초기화 (OpenAI 전용 모델 지정)
+## 모델이 구형이라 해당 라이브러리에서 지원하지 않음
+# llm1 = init_chat_model(MODEL1, model_provider="openai")
+# prompt1 = "다음 문장을 한국어로 번역해: Good Morning"
+# # invoke의 결과물로 Message 객체가 반환되므로 .content를 통해 텍스트만 출력합니다.
+# print(llm1.invoke(prompt1))
+# print("=" * 30)
+
+# 2. Q&A용 모델 초기화
+llm2 = init_chat_model(MODEL2, model_provider="openai")
+prompt2 = "게임 회사를 창업하려는데 이름 후보 3개 작명"
+print(llm2.invoke(prompt2))
+print("=" * 30)
+
+# 3. SystemMessage 구조 활용
+prompt3 = [
+    SystemMessage(content="당신은 창의력 높은 작명가입니다."),
+    HumanMessage(content=prompt2),
+]
+
+print(llm2.invoke(prompt3))
+print("=" * 30)

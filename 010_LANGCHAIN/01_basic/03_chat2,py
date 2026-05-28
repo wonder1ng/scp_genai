@@ -1,0 +1,19 @@
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI # Q&A용
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+
+load_dotenv()
+
+MODEL = "gpt-4o-mini"
+
+llm = ChatOpenAI(model=MODEL)
+
+prompt = [
+    SystemMessage("당신은 경력 10년차 호텔 훼프입니다."),
+    HumanMessage("오늘 저녁 메뉴를 추천해줘"),
+    AIMessage("비빔밥은 어떠냐"),
+    HumanMessage("이를 위한 재료?")
+]
+
+result = llm.invoke(prompt)
+print(result.content)
