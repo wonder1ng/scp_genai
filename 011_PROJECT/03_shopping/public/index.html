@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>상품 리뷰</h1>
+    <div class="product-image">
+      <img src="https://picsum.photos/600/400" />
+    </div>
+    <section class="review-form">
+      <h2>후기를 작성해주세요</h2>
+      <div>
+        <span>평점:</span>
+        <label><input type="radio" name="rating" value="1" />1</label>
+        <label><input type="radio" name="rating" value="2" />2</label>
+        <label><input type="radio" name="rating" value="3" />3</label>
+        <label><input type="radio" name="rating" value="4" />4</label>
+        <label><input type="radio" name="rating" value="5" />5</label>
+      </div>
+      <textarea
+        id="comment"
+        placeholder="후기를 작성해주세요"
+        rows="5"
+        cols="40"
+      ></textarea>
+      <br />
+      <button id="send">제출</button>
+      <section>
+        <h2 style="display: inline">리뷰&nbsp;</h2>
+        <select name="lang" id="lang">
+          <option value="한국어" selected>한국어</option>
+          <option value="English">English</option>
+          <option value="日本語">日本語</option>
+          <option value="中文">中文</option>
+        </select>
+        <div id="review-container">
+          <div id="ai-summary">
+            <p><strong>AI 요약: </strong>현재는 리뷰가 없습니다.</p>
+            <p><strong>평균 별점: </strong>N/A</p>
+          </div>
+        </div>
+      </section>
+    </section>
+    <script>
+      document.getElementById("lang").addEventListener("change", async (e) => {
+        const lang = document.getElementById("lang");
+        const summary = document.getElementById("ai-summary");
+        const response = await fetch(
+          `api/reviews?lang=${e.target.value}&message=${summary.firstElementChild.innerText.slice(7)}`,
+        );
+        const data = await response.json();
+        summary.firstElementChild.innerHTML = `<strong>AI 요약: </strong>${data.message}`;
+      });
+
+      document.getElementById("send").addEventListener("click", async () => {
+        const comment = document.getElementById("comment");
+        const radio = document.getElementsByTagName("input");
+        const reviewContatiner = document.getElementById("review-container");
+        const rating = Array.from(radio).filter((v) => v.checked)[0];
+        const summary = document.getElementById("ai-summary");
+
+        const response = await fetch("api/reviews", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            comment: comment.value,
+            rating: rating.value,
+          }),
+        });
+        const data = await response.json();
+
+        reviewContatiner.innerHTML =
+          summary.outerHTML +
+          data.reviews
+            .map(
+              (v) =>
+                `<div><strong>Rating: <span class="score">${v.rating}</span></strong><div class="review">${v.comment}</div></div>`,
+            )
+            .join("");
+
+        const summaryResponse = await fetch("api/ai-summary");
+        const summaryData = await summaryResponse.json();
+        rating.checked = false;
+        comment.value = "";
+        const newSummary = document.getElementById("ai-summary");
+        newSummary.firstElementChild.innerHTML = `<strong>AI 요약: </strong>${summaryData.message}`;
+        newSummary.lastElementChild.innerHTML = `<strong>평균 별점: </strong>${summaryData.rating}`;
+      });
+    </script>
+  </body>
+</html>

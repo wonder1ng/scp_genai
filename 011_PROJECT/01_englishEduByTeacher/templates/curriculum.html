@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block content %}
+<h2>{{ grade }}학년 - {{ curriculum_title }}</h2>
+<h1>스트림 채팅</h1>
+<div id="chatbot">
+  <div id="chatLog">
+    <form id="chatForm">
+      <input type="text" id="userInput" placeholder="메시지를 입력하시오" />
+      <button type="submit">전송</button>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById("chatForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const userInput = document.getElementById("userInput").value;
+    const chatLog = document.getElementById("chatLog");
+
+    chatLog.innerText += `<div>질문: ${userInput}</div>`;
+
+    const response = await fetch("api/chat", {
+      method: "POST",
+      headers: {
+        // "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
+      },
+      body: new URLSearchParams({ user_input: userInput }),
+    });
+    const data = await response.josn();
+    console.log(data);
+    chatLog.innerHTML += `<div>응답: ${data.response}</div>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  });
+</script>
+{% endblock %}

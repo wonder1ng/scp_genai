@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>GitHub 코드 취약점 분석기</h1>
+    <form id="codeForm">
+      <label for="codeUrl">GitHub 파일 URL</label>
+      <input
+        type="text"
+        name="codeUrl"
+        id="codeUrl"
+        placeholder="github의 코드 파일 url 입력"
+      />
+      <div>
+        <div>분석할 취약점 유형 선택 (복수 선택 가능):</div>
+        <input type="checkbox" name="weak1" id="weak1" class="weak" checked />
+        <label class="weakLabel" for="weak1">민감정보(하드 코딩된 암호)</label>
+        <input type="checkbox" name="weak2" id="weak2" class="weak" checked />
+        <label class="weakLabel" for="weak2">SQL Injection</label>
+        <input type="checkbox" name="weak3" id="weak3" class="weak" checked />
+        <label class="weakLabel" for="weak3">XSS</label>
+        <input type="checkbox" name="weak4" id="weak4" class="weak" checked />
+        <label class="weakLabel" for="weak4">Broken Access Control</label>
+        <input type="checkbox" name="weak5" id="weak5" class="weak" checked />
+        <label class="weakLabel" for="weak5"
+          >Software Supply Chain Failures</label
+        >
+        <br />
+        <button type="submit">Check</button>
+      </div>
+    </form>
+    <h2>소스 코드</h2>
+    <pre style="background-color: darkgray" id="sourceCodeText"></pre>
+    <h2>분석 결과</h2>
+    <pre style="background-color: darkgray" id="result"></pre>
+    <script>
+      document
+        .getElementById("codeForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const codeUrl = document.getElementById("codeUrl");
+          const sourceCodeText = document.getElementById("sourceCodeText");
+          const result = document.getElementById("result");
+          const selects = document.getElementsByClassName("weak");
+          const weaks = document.getElementsByClassName("weakLabel");
+
+          const response = await fetch("web/api/codecheck", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              codeUrl: codeUrl.value,
+              checked: Array.from(selects).map((v) => v.checked),
+              weaks: Array.from(weaks).map((v) => v.innerText),
+            }),
+          });
+          const data = await response.json();
+          console.log("data");
+          console.log(data);
+          codeUrl.value = data.url;
+          data.sourceCode.split("\n").map((v, i) => {
+            let codeDiv = document.createElement("div");
+            codeDiv.id = `codeLine-${i + 1}`;
+            codeDiv.innerText = v;
+            sourceCodeText.appendChild(codeDiv);
+          });
+          Array.from(data.lines).map((v) => {
+            weakCode = document.getElementById(`codeLine-${v}`);
+            weakCode.style.backgroundColor = "red";
+          });
+          result.innerText = data.result;
+        });
+    </script>
+  </body>
+</html>
