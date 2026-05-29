@@ -1,9 +1,5 @@
 from dotenv import load_dotenv
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableLambda, RunnableParallel
 
@@ -14,21 +10,14 @@ from langchain_core.runnables import RunnableLambda, RunnableParallel
 # RunnableParallel
 
 load_dotenv()
-
-template = "다음의 긴 내용을 3개의 문장으로 요약하시오.\n\n{article}"
-chat_prompt = ChatPromptTemplate.from_messages([
-    SystemMessagePromptTemplate.from_template("당신은 전문 문장 요약가입니다."),
-    HumanMessagePromptTemplate.from_template(template)
-])
-
 llm = ChatOpenAI(model="gpt-4o-mini")
 
 base_prompt = ChatPromptTemplate(
     [("system", "다음 기사에 대해 {action} 기술하시오"),
      ("human", "{text}")])
 
-chain_summary = base_prompt.partial(action="3줄요약하여 간략히") | llm | RunnableLambda(lambda x: x.content.strip())
-chain_analysis = base_prompt.partial(action="감정분석하여 어떤 감정인지 간략히") | llm | RunnableLambda(lambda x: x.content.strip())
+chain_summary = base_prompt.partial(action="3줄 요약하여 간략히") | llm | RunnableLambda(lambda x: x.content.strip())
+chain_analysis = base_prompt.partial(action="감정 분석하여 어떤 감정인지 간략히") | llm | RunnableLambda(lambda x: x.content.strip())
 chain_categorize = base_prompt.partial(action="어떤 카테고리의 기사인지 분석하여 간략히") | llm | RunnableLambda(lambda x: x.content.strip())
 
 input_text = {
