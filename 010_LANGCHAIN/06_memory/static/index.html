@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="login">
+      <label for="name">사용자 이름:</label>
+      <br />
+      <input type="text" name="name" id="name" required />
+      <button type="submit">로그인</button>
+    </form>
+  </body>
+  <script>
+    const chatBody = `
+            <form onclick="fetch('/api/logout')" style="display: inline;">
+              <button type="submit">로그아웃</button>
+            </form>
+            <form id="chat" onsubmit='message(event)'>
+              <ul
+                id="chatting"
+                style="width: 80vw; height: 50vh; background-color: lightgray"
+              ></ul>
+              <div>
+                <input type="text" id="send" required />
+                <button type="submit">보내기</button>
+              </div>
+            </form>`;
+    fetch(`/api/login`)
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.user)
+          document.body.innerHTML = `<h1>${data.user}</h1>` + chatBody;
+      });
+    document.getElementById("login").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const user = document.getElementById("name").value;
+      if (!user) {
+        alert("사용자 이름을 입력해야 합니다.");
+        return;
+      }
+      fetch(`/api/login?user=${user}`)
+        .then((resp) => resp.json())
+        .then((data) => {
+          if (data.user)
+            document.body.innerHTML = `<h1>${data.user}</h1>` + chatBody;
+        });
+    });
+    function message(e) {
+      e.preventDefault();
+      const user = document.getElementsByTagName("h1")[0].innerText;
+      const chatting = document.getElementById("chatting");
+      const send = document.getElementById("send");
+      chatting.innerHTML += `<li>${user}: ${send.value}</li>`;
+      fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ message: send.value }),
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          chatting.innerHTML += `<li>챗봇: ${data.message}</li>`;
+        });
+      send.value = "";
+    }
+  </script>
+</html>
