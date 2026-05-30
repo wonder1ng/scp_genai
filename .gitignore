@@ -9,6 +9,8 @@ tmp*.*
 *.sqlite*
 *.zip
 *.json
+*.pdf
+chroma_db/
 # vibe coding
 04_memo
 05_music_sns
