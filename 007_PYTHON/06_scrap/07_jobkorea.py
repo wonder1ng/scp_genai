@@ -63,7 +63,7 @@ for num in range(1, 999999):
             # time.sleep(random.uniform(1, 13))
 
 base_path = "\\".join(__file__.split("\\")[:-1])
-fileName = base_path + f"\\jobkorea_post{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.tsv"
+fileName = base_path + f"\\jobkorea_post_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.tsv"
 mode = "a+" if os.path.exists(fileName) else "w+"
 with open(fileName, mode, newline="", encoding="utf_8") as f:
     writer = csv.writer(f, delimiter="\t")
