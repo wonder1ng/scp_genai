@@ -33,7 +33,7 @@ retriever = store.as_retriever(search_kwargs={"k": 3})
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "당신은 문서 기반 QA시스템입니다. 아래 문서만 참고해서 답변하시오.\n문서:\n{context}"),
+    ("system", "당신은 문서 기반 QA시스템입니다. 아래 문서만 참고해서 답변하시오.\n문서:\n{context}\n\n출처:\n{sources}"),
     ("user", "{question}")
 ])
 
@@ -60,9 +60,16 @@ def append_source(d):
     src_lines = "\n".join(f" - {s}" for s in d["sources"])
     return f"{d['answer']}\n\n참고문서:\n{src_lines}"
 
+def debug_prompt(prompt):
+    print("\n=== PROMPT ===")
+    for msg in prompt.messages:
+        print(f"[{msg.type.upper()}]\n{msg.content}")
+    print("\n=== 출력 끝 ===\n")
+    return prompt
+
 chain = (
     RunnableLambda(retriever_and_split)    
-    | RunnablePassthrough.assign(answer=(prompt | llm | StrOutputParser()))
+    | RunnablePassthrough.assign(answer=(prompt | RunnableLambda(debug_prompt) | llm | StrOutputParser()))
     | RunnableLambda(append_source)
 )
 

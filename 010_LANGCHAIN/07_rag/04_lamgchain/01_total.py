@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
@@ -40,9 +40,17 @@ prompt = ChatPromptTemplate.from_messages([
 def format_docs(docs):
     return "\n\n".join(d.page_content for d in docs)
 
+def debug_prompt(prompt):
+    print("\n=== PROMPT ===")
+    for msg in prompt.messages:
+        print(f"[{msg.type.upper()}]\n{msg.content}")
+    print("\n=== 출력 끝 ===\n")
+    return prompt
+
 chain = (
     RunnablePassthrough.assign(context=lambda x: print(format_docs(retriever.invoke(x["question"]))) or format_docs(retriever.invoke(x["question"])))
     | prompt
+    | RunnableLambda(debug_prompt)
     | llm
     |StrOutputParser()
 )
