@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>RAG 챗봇</h1>
+    <div>
+      <div>
+        <h2>PDF 업로드</h2>
+        <form id="upload-form">
+          <input type="file" id="file-input" accept=".pdf" />
+          <button type="submit">업로드</button>
+        </form>
+        <form id="delete-form">
+          <button type="submit">업로드된 파일 제거</button>
+        </form>
+      </div>
+      <div>
+        <h2>질문하기</h2>
+        <form id="ask-form">
+          <input
+            type="text"
+            id="question-input"
+            placeholder="질문을 입력하세요"
+          />
+          <button type="submit">질문</button>
+        </form>
+        <div id="answer"></div>
+      </div>
+    </div>
+  </body>
+  <script>
+    // 1. "업로드" 버튼을 통해서 문서 전송한다 (fetch('/upload') -> 결과 받아서 성공/실패 여부 출력)
+    // 2. "질문" 버튼을 통해서 질문 한다 (fetch('/ask') -> 결과 받아서 아래 div 에 답변 출력)
+    document.getElementById("delete-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("file-input");
+      const formData = new FormData();
+      console.log(input.files[0]);
+
+      formData.append("file", input.files[0]);
+      fetch("delete", {
+        method: "POST",
+        body: formData,
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          alert(data.message);
+        });
+    });
+    document.getElementById("upload-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("file-input");
+      const formData = new FormData();
+      console.log(input.files[0]);
+
+      formData.append("file", input.files[0]);
+      fetch("upload", {
+        method: "POST",
+        body: formData,
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          alert(data.message);
+        });
+    });
+    document.getElementById("ask-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("question-input");
+      const answer = document.getElementById("answer");
+      fetch("ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input.value }),
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          answer.innerHTML += `<div>질문: ${input.value}</div><div>답변: ${data.message}</div><br />`;
+        });
+    });
+  </script>
+</html>
