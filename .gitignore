@@ -10,6 +10,9 @@ tmp*.*
 *.zip
 *.json
 *.pdf
+*.png
+*.wav
+*.mp3
 chroma_db/
 data/
 # vibe coding
