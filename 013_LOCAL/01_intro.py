@@ -1,0 +1,9 @@
+import ollama
+
+ollama.pull("mistral")
+response = ollama.chat(model="mistral", messages=[
+    {"role": "user", "content": "인공지능에 대해서 간결히 설명해줘"}
+])
+
+print(response)
+print(response["message"]["content"])
