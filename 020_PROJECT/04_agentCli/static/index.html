@@ -1,0 +1,55 @@
+<!-- prettier ignore -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <div id="reserve">예약 조건</div>
+      <div id="alarm">알림</div>
+      <div id="approve">승인 요청</div>
+      <div id="log">로그</div>
+    </div>
+    <div>
+      <h2>챗봇</h2>
+      <form id="chat-form">
+        <input
+          type="text"
+          id="question-input"
+          placeholder="질문을 입력하세요"
+        />
+        <button type="submit">전송</button>
+      </form>
+      <div id="answer"></div>
+    </div>
+  </body>
+  <script>
+    document.getElementById("chat-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("question-input");
+      const answer = document.getElementById("answer");
+      const reserve = document.getElementById("reserve");
+      const alarm = document.getElementById("alarm");
+      fetch("chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: input.value }),
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          if (data.message.reserve) {
+            answer.innerHTML += `<div>질문: ${input.value}</div><div>답변: 해당 내용이 예약되었습니다.</div><br />`;
+            reserve.innerHTML += `<div>${data.message.reserve}</div>`;
+          } else if (data.message.alarm) {
+            answer.innerHTML += `<div>질문: ${input.value}</div><div>답변: 해당 알림이 등록되었습니다.</div><br />`;
+            alarm.innerHTML += `<div>${data.message.alarm}</div>`;
+          } else
+            answer.innerHTML += `<div>질문: ${input.value}</div><div>답변: ${data.message}</div><br />`;
+          input.value = "";
+        });
+    });
+  </script>
+</html>
