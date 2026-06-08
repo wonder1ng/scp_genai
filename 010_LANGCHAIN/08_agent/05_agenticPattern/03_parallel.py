@@ -82,13 +82,22 @@ for k, v in result.items():
         print(v2.score)
         print(v2.evaluate)
         final[k] += v2.score
-    final[k] = (final[k], v.translation)
+    final[k] = {"score": final[k], "translation": v.translation}
     print()
 
-final = dict(sorted(final.items(), key=lambda i: i[1][0], reverse=True))
-print("final")
+final = dict(sorted(final.items(), key=lambda i: i[1]["score"], reverse=True))
+
+print("점수 합산")
+chosen = {"max_score": 0}
 for k, v in final.items():
-    print("최종")
+    if chosen["max_score"] < v["score"]:
+        chosen= {"max_score": v["score"]}
+        chosen.update({k:v})
+    elif chosen["max_score"] == v["score"]:
+        chosen.update({k:v})
     print(k)
     print(v)
     print()
+
+print("최종")
+[print(k, i) for k, i in chosen.items()]
