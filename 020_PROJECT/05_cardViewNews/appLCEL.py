@@ -1,0 +1,107 @@
+from dotenv import load_dotenv
+import base64, requests, os
+from bs4 import BeautifulSoup
+from openai import OpenAI
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+load_dotenv()
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+client = OpenAI()
+
+def full_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
+
+def fetch_news(query):
+    """뉴스 검색 결과를 가져온다."""
+    url = "http://news.google.com/rss/search"
+    params = {
+        "q": query,
+        "hl": "ko",
+        "gl": "KR",
+        "ceid": "KR:ko"
+    }
+
+    xml = requests.get(url, params=params, timeout=10).text
+    soup = BeautifulSoup(xml, "xml")
+
+    items = []
+    for item in soup.find_all("items")[:8]:
+        items.append({
+            "title": item.title.text,
+            "link": item.link.text,
+            "date": item.pubDate.text
+        })
+    return str(items)
+
+def make_image_prompt(news):
+    prompt = f"""
+    다음 뉴스 내용을 바탕으로 웹툰형 카드 뉴스 이미지 생성 프롬프트를 만드시오.
+    조건:
+    - 한 장짜리 이미지
+    - 여러 컷 웹툰 스타일
+    - 한국어 텍스트 포함
+    - 날짜가 있다면 각 날짜별로 패널을 구성
+    - 뉴스 카드 + 만화 컷 + 인포그래픽 형태로 혼합 구성
+    - 인물은 실제 해당 유명인을 캐릭터화한 느낌으로 생성
+    - 회사 로고나 상표 등을 적절하게 활용해서 실제 내용을 살ㄹ미
+    - moderation에 위배가 될 만한 사유는 생성 금지
+    뉴스: {news}
+    """
+    result = llm.invoke(prompt)
+    return result.content
+
+def generate_image(image_prompt, output="output_lcel.png"):
+    output = full_path(output)
+    result = client.images.generate(
+        model="gpt-image-1.5",
+        prompt=image_prompt,
+        size="1024x1536",
+        quality="medium"
+    )
+
+    image_base64 = result.data[0].b64_json
+    with open(output, "wb") as f:
+        f.write(base64.b64decode(image_base64))
+    
+    return output
+
+# news_agent = create_agent(
+#     model=llm,
+#     tools=[fetch_news],
+#     system_prompt="""너는 뉴스 조사 에이전트. 사용자 주제와 관련된 뉴스 목록을 수집해 일정/날짜/행사/만남 정보를 중심으로 정리"""
+# )
+
+summarize_chain = {
+    ChatPromptTemplate.from_messages([
+        ("system", "너는 OOO이다"),
+        ("human", "다음 뉴스로 OOO해라.")
+    ])
+    | llm
+    | StrOutputParser()
+}
+
+pipeline = (
+    RunnablePassthrough.assign(news=fetch_news)
+    | RunnablePassthrough.assign(summary=summarize_chain)
+    | RunnablePassthrough.assign(image_prompt=make_image_prompt)
+    | RunnablePassthrough.assign(image_path=generate_image)
+)
+
+def main():
+    result = pipeline.invoke({"query": "젠승 황 4박 5일 한국 방문 일정 관련 최신 뉴스 조사"})
+    print("\n[뉴스 요약]")
+    print(result["summary"])
+    print("-" * 60)
+
+    print("\n[이미지 프롬프트]")
+    print(result["image_prompt"])
+
+    print(f"\n이미지 생성 완료: {result["image_path"]}")
+
+if __name__ == "__main__":
+    main()
